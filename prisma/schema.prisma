@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id                     String          @id @default(cuid())
+  name                   String          @unique
+  color                  String
+  icon                   String
+  defaultDurationMinutes Int
+  defaultReminderMinutes Json
+  sortOrder              Int             @default(0)
+  isActive               Boolean         @default(true)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  templates              EventTemplate[]
+
+  @@index([sortOrder])
+}
+
+model LocationTemplate {
+  id                 String          @id @default(cuid())
+  name               String          @unique
+  address            String
+  link               String?
+  notes              String?
+  defaultDescription String?
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  templates          EventTemplate[]
+}
+
+model EventTemplate {
+  id                     String            @id @default(cuid())
+  name                   String            @unique
+  titleTemplate          String
+  categoryId             String
+  locationTemplateId     String?
+  defaultDurationMinutes Int
+  defaultDescription     String?
+  defaultReminderMinutes Json
+  isAllDayDefault        Boolean           @default(false)
+  isActive               Boolean           @default(true)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  category               Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  locationTemplate       LocationTemplate? @relation(fields: [locationTemplateId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@index([locationTemplateId])
+}
+
+model UiSettings {
+  id           String   @id @default(cuid())
+  defaultView  String   @default("week")
+  weekStartsOn Int      @default(1)
+  timezone     String   @default("Europe/Berlin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
