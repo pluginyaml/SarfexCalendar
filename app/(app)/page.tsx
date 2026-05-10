@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
+import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 const overviewCards = [
   {
@@ -28,13 +30,15 @@ export default function DashboardPage() {
       <Header
         eyebrow="Dashboard"
         title="Übersicht für deinen Handelsfachwirt"
-        description="Die stabile Basis steht. Im nächsten Schritt hängen wir Auth, Session-Schutz und die ersten echten Datenpfade an."
+        description="Die Uebersicht kombiniert lokale Metadaten mit echten Nextcloud-CalDAV-Terminen und haelt die naechsten Lern- und Pruefungspunkte im Blick."
         actions={
           <Button asChild>
             <Link href="/events/new">+ Termin</Link>
           </Button>
         }
       />
+
+      <DashboardOverview timezone={DEFAULT_TIMEZONE} />
 
       <section className="grid gap-4 md:grid-cols-3">
         {overviewCards.map((card) => (
@@ -56,23 +60,23 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
                 <CardTitle>Nächste Ausbaustufen</CardTitle>
-                <CardDescription>Die Reihenfolge bleibt strikt build-orientiert.</CardDescription>
+                <CardDescription>Build-Stabilitaet bleibt weiterhin das leitende Prinzip.</CardDescription>
               </div>
               <Badge variant="secondary">Stabil zuerst</Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>1. Session-Login und geschützte Server-Routen.</p>
-            <p>2. Prisma-CRUD für Kategorien, Vorlagen, Standorte und UI-Einstellungen.</p>
-            <p>3. CalDAV-Service mit time-range Queries, ETag-Konflikten und ICS-Handling.</p>
-            <p>4. Kalender- und Listen-UI mit echter Nextcloud-Synchronisation.</p>
+            <p>1. Build, Docker, Prisma und Auth sind bereits sauber stabilisiert.</p>
+            <p>2. Kategorien, Vorlagen, Standorte und UI-Einstellungen sind bearbeitbar.</p>
+            <p>3. CalDAV, ICS-Handling und echte Event-CRUDs sind jetzt verdrahtet.</p>
+            <p>4. Als Nächstes bleibt vor allem Dokumentation und praktischer Laufzeittest mit echter Nextcloud.</p>
           </CardContent>
         </Card>
 
         <Card className="card-shadow border-white/70 bg-card/90">
           <CardHeader>
             <CardTitle>CalDAV-Hinweis</CardTitle>
-            <CardDescription>Noch kein Runtime-Test aktiv</CardDescription>
+            <CardDescription>Verbindungstest in den Einstellungen verfuegbar</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
             <p>

@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CalendarManager } from "@/components/calendar/calendar-manager";
+import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 export const metadata = {
   title: "Kalender",
@@ -11,26 +12,9 @@ export default function CalendarPage() {
       <Header
         eyebrow="Kalender"
         title="Tages-, Wochen- und Monatsansicht"
-        description="Die Oberfläche ist vorbereitet. Die eigentlichen Event-Blöcke werden nach dem CalDAV-Service direkt mit Nextcloud-Daten befüllt."
+        description="Die Ansichten lesen Termine direkt aus Nextcloud und bleiben auf Europe/Berlin sowie Wochenstart Montag ausgerichtet."
       />
-
-      <section className="grid gap-4 xl:grid-cols-3">
-        {[
-          ["Tag", "Detailansicht für einzelne Lerntage und Prüfungen."],
-          ["Woche", "Montag als Wochenstart, mobil später horizontal scrollbar."],
-          ["Monat", "Ruhige Gesamtübersicht mit farbigen Kategorien."],
-        ].map(([title, description]) => (
-          <Card key={title} className="card-shadow border-white/70 bg-card/90">
-            <CardHeader>
-              <CardTitle>{title}</CardTitle>
-              <CardDescription>{description}</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm leading-6 text-muted-foreground">
-              Platzhalteransicht bis die CalDAV-Event-Transformation fertig ist.
-            </CardContent>
-          </Card>
-        ))}
-      </section>
+      <CalendarManager timezone={DEFAULT_TIMEZONE} />
     </div>
   );
 }

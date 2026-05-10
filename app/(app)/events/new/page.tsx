@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EventEditor } from "@/components/events/event-editor";
+import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 export const metadata = {
   title: "Neuer Termin",
@@ -11,21 +12,9 @@ export default function NewEventPage() {
       <Header
         eyebrow="Neuer Termin"
         title="Terminformular vorbereiten"
-        description="Pflichtfelder, All-Day-Handling, Vorlagen und Erinnerungen werden im Event-Schritt umgesetzt."
+        description="Pflichtfelder, All-Day-Handling, Vorlagen, Standorte und Erinnerungen werden direkt in einen echten CalDAV-Termin geschrieben."
       />
-
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
-          <CardTitle>Formular-Blueprint</CardTitle>
-          <CardDescription>
-            Das Formular wird später Kategorie, Dauer, Standortvorlagen und Reminder sauber
-            vorbefüllen.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
-          Noch nicht mit Zod und CalDAV verbunden.
-        </CardContent>
-      </Card>
+      <EventEditor mode="create" timezone={DEFAULT_TIMEZONE} />
     </div>
   );
 }

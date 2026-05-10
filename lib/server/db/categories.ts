@@ -1,6 +1,7 @@
 import "server-only";
 import type { Category } from "@prisma/client";
 import { prisma } from "@/lib/server/db/prisma";
+import { AppError } from "@/lib/server/errors";
 import type { CategoryPayload } from "@/lib/validation/categories";
 import { normalizeReminderMinutes } from "@/lib/reminders";
 import type { CategoryRecord } from "@/types/entities";
@@ -57,4 +58,34 @@ export async function deleteCategory(id: string) {
   await prisma.category.delete({
     where: { id },
   });
+}
+
+export async function ensureCategoryExistsByName(name: string) {
+  const category = await prisma.category.findUnique({
+    where: {
+      name,
+    },
+  });
+
+  if (!category) {
+    throw new AppError("Die Kategorie muss existieren.", {
+      code: "CATEGORY_NOT_FOUND",
+      statusCode: 422,
+    });
+  }
+
+  return mapCategory(category);
+}
+
+export async function getCategoryColorMap() {
+  const categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      color: true,
+    },
+  });
+
+  return Object.fromEntries(
+    categories.map((category) => [category.name.toLowerCase(), category.color]),
+  ) as Record<string, string>;
 }

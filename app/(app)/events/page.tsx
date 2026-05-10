@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { EventsManager } from "@/components/events/events-manager";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 export const metadata = {
   title: "Termine",
@@ -13,26 +14,14 @@ export default function EventsPage() {
       <Header
         eyebrow="Termine"
         title="Chronologische Listenansicht"
-        description="Hier entsteht die filterbare 6-Monats-Liste mit Suche, Kategorie- und Standortfilter."
+        description="Die Liste zeigt standardmaessig die naechsten sechs Monate und laesst sich nach Text, Kategorie und Standort filtern."
         actions={
           <Button asChild>
             <Link href="/events/new">+ Termin</Link>
           </Button>
         }
       />
-
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
-          <CardTitle>Listendarstellung</CardTitle>
-          <CardDescription>
-            Die Daten werden später direkt per CalDAV im gewünschten Zeitraum geladen.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm leading-6 text-muted-foreground">
-          <p>Suche, Kategorien, Standortfilter und Monatsgruppierung folgen nach dem CRUD-Schritt.</p>
-          <p>Die App bleibt build-stabil, obwohl die fachlichen Teile noch nacheinander dazukommen.</p>
-        </CardContent>
-      </Card>
+      <EventsManager timezone={DEFAULT_TIMEZONE} />
     </div>
   );
 }

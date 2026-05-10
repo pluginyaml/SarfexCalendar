@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EventEditor } from "@/components/events/event-editor";
+import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 type EventDetailPageProps = {
   params: Promise<{
@@ -15,20 +16,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <Header
         eyebrow="Termin bearbeiten"
         title="Detailansicht"
-        description={`Die Event-Bearbeitung für "${id}" wird nach dem CalDAV-Service über href und ETag abgesichert.`}
+        description={`Die Event-Bearbeitung fuer "${id}" ist ueber href und ETag konfliktgesichert.`}
       />
-
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
-          <CardTitle>Update per If-Match</CardTitle>
-          <CardDescription>
-            Konflikte mit iPhone oder Nextcloud-Weboberfläche werden später verständlich angezeigt.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
-          Noch kein Live-Abruf. Die Route ist nur bewusst schon im finalen URL-Schema angelegt.
-        </CardContent>
-      </Card>
+      <EventEditor eventId={id} mode="edit" timezone={DEFAULT_TIMEZONE} />
     </div>
   );
 }

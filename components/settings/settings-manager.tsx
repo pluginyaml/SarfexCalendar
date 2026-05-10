@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { requestJson } from "@/lib/http-client";
 import type { DefaultView, UiSettingsRecord } from "@/types/entities";
+import type { CalDavConnectionResult } from "@/lib/caldav";
 import { CalDavStatusCard } from "@/components/settings/caldav-status-card";
 import { ConnectionTestButton } from "@/components/settings/connection-test-button";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,16 @@ const weekOptions = [
 
 export function SettingsManager() {
   const [settings, setSettings] = useState<UiSettingsRecord | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<"pending" | "success" | "error">(
+    "pending",
+  );
+  const [connectionMessage, setConnectionMessage] = useState(
+    "Noch kein Live-Verbindungstest ausgefuehrt",
+  );
+  const [connectionDetail, setConnectionDetail] = useState(
+    "Die Verbindung zu Nextcloud laesst sich hier direkt gegen den konfigurierten CalDAV-Kalender pruefen.",
+  );
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +119,33 @@ export function SettingsManager() {
     }
   });
 
+  const handleConnectionTest = async () => {
+    setIsTestingConnection(true);
+
+    try {
+      const result = await requestJson<CalDavConnectionResult>("/api/caldav/test", {
+        method: "POST",
+      });
+
+      setConnectionStatus("success");
+      setConnectionMessage(result.message);
+      setConnectionDetail(result.calendarUrl);
+      toast.success("CalDAV-Verbindung erfolgreich getestet.");
+    } catch (testError) {
+      const message =
+        testError instanceof Error
+          ? testError.message
+          : "CalDAV-Verbindung konnte nicht geprueft werden.";
+
+      setConnectionStatus("error");
+      setConnectionMessage("Verbindungstest fehlgeschlagen");
+      setConnectionDetail(message);
+      toast.error(message);
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="rounded-[1.75rem] border border-white/70 bg-card/90 px-5 py-8 text-sm text-muted-foreground">Einstellungen werden geladen...</div>;
   }
@@ -119,10 +157,15 @@ export function SettingsManager() {
   return (
     <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
       <CalDavStatusCard
-        detail="Der echte Runtime-Test gegen Nextcloud folgt im CalDAV-Schritt. Die Karte und der Button sind bereits an der finalen Stelle vorbereitet."
-        message="Noch kein Live-Verbindungstest ausgefuehrt"
-        status="pending"
-        actions={<ConnectionTestButton disabled />}
+        detail={connectionDetail}
+        message={connectionMessage}
+        status={connectionStatus}
+        actions={
+          <ConnectionTestButton
+            isPending={isTestingConnection}
+            onClick={handleConnectionTest}
+          />
+        }
       />
 
       <Card className="card-shadow border-white/70 bg-card/90">
