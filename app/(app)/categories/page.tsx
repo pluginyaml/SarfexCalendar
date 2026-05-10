@@ -1,5 +1,5 @@
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CategoryManager } from "@/components/categories/category-manager";
 
 export const metadata = {
   title: "Kategorien",
@@ -11,20 +11,9 @@ export default function CategoriesPage() {
       <Header
         eyebrow="Kategorien"
         title="Farben, Icons und Standarderinnerungen"
-        description="Die Standardkategorien sind bereits im Seed vorbereitet und werden als nächste Fachschicht an das UI angeschlossen."
+        description="Hier verwaltest du die lokalen Metadaten, die spaeter Terminfarbe, Icon, Dauer und Reminder vorgeben."
       />
-
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
-          <CardTitle>Seed-Konzept steht</CardTitle>
-          <CardDescription>
-            Onlineeinheit, Vorkurs, Präsenzphase, Prüfung, Deadline, Arbeit, Privat, Sonstiges.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
-          Bearbeitbar werden Name, Farbe, Icon, Dauer, Erinnerungen, Sortierung und Aktivstatus.
-        </CardContent>
-      </Card>
+      <CategoryManager />
     </div>
   );
 }
