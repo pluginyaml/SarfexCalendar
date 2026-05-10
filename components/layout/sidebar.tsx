@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays } from "lucide-react";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { appNavigation } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export function Sidebar() {
+type SidebarProps = {
+  userEmail: string;
+};
+
+export function Sidebar({ userEmail }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -54,6 +59,14 @@ export function Sidebar() {
           })}
         </nav>
       </ScrollArea>
+
+      <div className="mt-5 rounded-[1.5rem] border border-white/60 bg-white/70 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Eingeloggt als
+        </p>
+        <p className="mt-2 truncate text-sm font-semibold text-foreground">{userEmail}</p>
+        <LogoutButton className="mt-4 w-full" />
+      </div>
     </aside>
   );
 }

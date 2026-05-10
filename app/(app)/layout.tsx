@@ -1,9 +1,12 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { requirePageSession } from "@/lib/server/auth/session";
 
-export default function ProtectedAppLayout({
+export default async function ProtectedAppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AppShell>{children}</AppShell>;
+  const session = await requirePageSession();
+
+  return <AppShell userEmail={session.email}>{children}</AppShell>;
 }

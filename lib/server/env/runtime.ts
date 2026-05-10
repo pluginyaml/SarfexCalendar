@@ -27,6 +27,9 @@ const runtimeEnvSchema = z.object({
 
 export type RuntimeEnv = z.infer<typeof runtimeEnvSchema>;
 export type RuntimeEnvKey = keyof RuntimeEnv;
+type RequiredRuntimeEnv<Keys extends RuntimeEnvKey> = {
+  [Key in Keys]-?: NonNullable<RuntimeEnv[Key]>;
+};
 
 export function readRuntimeEnv(): RuntimeEnv {
   return runtimeEnvSchema.parse({
@@ -45,7 +48,7 @@ export function readRuntimeEnv(): RuntimeEnv {
 
 export function requireRuntimeEnv<const Keys extends RuntimeEnvKey[]>(
   ...keys: Keys
-): Pick<RuntimeEnv, Keys[number]> {
+): RequiredRuntimeEnv<Keys[number]> {
   const env = readRuntimeEnv();
   const missing = keys.filter((key) => !env[key]);
 
@@ -56,8 +59,7 @@ export function requireRuntimeEnv<const Keys extends RuntimeEnvKey[]>(
     );
   }
 
-  return Object.fromEntries(keys.map((key) => [key, env[key]])) as Pick<
-    RuntimeEnv,
+  return Object.fromEntries(keys.map((key) => [key, env[key]])) as RequiredRuntimeEnv<
     Keys[number]
   >;
 }
