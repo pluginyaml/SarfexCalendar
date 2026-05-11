@@ -1,28 +1,40 @@
 "use client";
 
-import Link from "next/link";
 import { formatInTimeZone } from "date-fns-tz";
 import { useEffect, useMemo, useState } from "react";
 import type { EventViewModel } from "@/lib/caldav";
-import { eventOccursOnDate, getUpcomingDaysRange } from "@/lib/event-time";
+import { eventOccursOnDate, getUpcomingEventsRange } from "@/lib/event-time";
 import { requestJson } from "@/lib/http-client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type DashboardOverviewProps = {
   timezone: string;
 };
 
-function formatDashboardEventDate(event: EventViewModel | null, timezone: string) {
+function normalizeCategory(value: string | null | undefined) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/\u00e4/g, "ae")
+    .replace(/\u00f6/g, "oe")
+    .replace(/\u00fc/g, "ue")
+    .replace(/\u00df/g, "ss")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function formatEventValue(event: EventViewModel | null, timezone: string) {
   if (!event) {
-    return null;
+    return "Keine";
   }
 
   if (event.allDay) {
     return event.start;
   }
 
-  return formatInTimeZone(event.start, timezone, "dd.MM.yyyy HH:mm");
+  return formatInTimeZone(event.start, timezone, "dd.MM. HH:mm");
+}
+
+function formatEventDetail(event: EventViewModel | null) {
+  return event?.title ?? "Noch nichts geplant";
 }
 
 export function DashboardOverview({ timezone }: DashboardOverviewProps) {
@@ -32,7 +44,7 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
 
   useEffect(() => {
     let isMounted = true;
-    const range = getUpcomingDaysRange(14, timezone);
+    const range = getUpcomingEventsRange(6, timezone);
 
     void (async () => {
       try {
@@ -44,7 +56,11 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
           return;
         }
 
-        setEvents(result);
+        setEvents(
+          [...result].sort(
+            (left, right) => new Date(left.start).getTime() - new Date(right.start).getTime(),
+          ),
+        );
       } catch (loadError) {
         if (!isMounted) {
           return;
@@ -68,58 +84,70 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
     () => events.filter((event) => eventOccursOnDate(event, todayKey, timezone)),
     [events, timezone, todayKey],
   );
-  const nextExam = events.find((event) => event.category === "Prüfung") ?? null;
-  const nextOnline = events.find((event) => event.category === "Onlineeinheit") ?? null;
+  const nextExam = useMemo(
+    () => events.find((event) => normalizeCategory(event.category) === "pruefung") ?? null,
+    [events],
+  );
+  const nextOnline = useMemo(
+    () => events.find((event) => normalizeCategory(event.category) === "onlineeinheit") ?? null,
+    [events],
+  );
+  const openDeadlines = useMemo(
+    () => events.filter((event) => normalizeCategory(event.category) === "deadline").length,
+    [events],
+  );
+
+  const items = [
+    {
+      label: "Heute",
+      value: isLoading ? "..." : `${todayEvents.length}`,
+      detail: todayEvents[0]?.title ?? "Keine Termine",
+      accentClass: "bg-foreground/70",
+    },
+    {
+      label: "Naechste Pruefung",
+      value: isLoading ? "..." : formatEventValue(nextExam, timezone),
+      detail: formatEventDetail(nextExam),
+      accentClass: "bg-rose-500/70",
+    },
+    {
+      label: "Naechste Onlineeinheit",
+      value: isLoading ? "..." : formatEventValue(nextOnline, timezone),
+      detail: formatEventDetail(nextOnline),
+      accentClass: "bg-sky-500/70",
+    },
+    {
+      label: "Offene Deadlines",
+      value: isLoading ? "..." : `${openDeadlines}`,
+      detail: openDeadlines > 0 ? "In den kommenden Monaten vorhanden" : "Aktuell nichts offen",
+      accentClass: "bg-amber-500/70",
+    },
+    {
+      label: "CalDAV",
+      value: error ? "Stoerung" : isLoading ? "Pruefe..." : "Verbunden",
+      detail: error ?? "Nextcloud ist die einzige Quelle der Wahrheit",
+      accentClass: error ? "bg-rose-500/70" : "bg-emerald-500/70",
+    },
+  ];
 
   return (
-    <section className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-4">
-      <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1 pb-2">
-          <CardDescription>Heute</CardDescription>
-          <CardTitle className="text-base">{isLoading ? "Laden..." : `${todayEvents.length} Termine`}</CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs leading-5 text-muted-foreground">
-          {todayEvents[0]?.title ?? "Heute ist noch nichts geplant."}
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1 pb-2">
-          <CardDescription>Naechste 14 Tage</CardDescription>
-          <CardTitle className="text-base">{isLoading ? "Laden..." : `${events.length} Termine`}</CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs leading-5 text-muted-foreground">
-          Ein kompakter Blick auf die direkt bevorstehenden Einheiten, Deadlines und Praesenztermine.
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1 pb-2">
-          <CardDescription>Naechste Pruefung</CardDescription>
-          <CardTitle className="text-base">{nextExam?.title ?? "Noch keine Pruefung gefunden"}</CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs leading-5 text-muted-foreground">
-          {formatDashboardEventDate(nextExam, timezone) ??
-            "Sobald CalDAV Daten liefert, wird hier die naechste Pruefung hervorgehoben."}
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1 pb-2">
-          <CardDescription>Naechste Onlineeinheit</CardDescription>
-          <CardTitle className="text-base">{nextOnline?.title ?? "Noch keine Onlineeinheit gefunden"}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-between gap-2 text-xs leading-5 text-muted-foreground">
-          <span>
-            {error
-              ? `CalDAV-Hinweis: ${error}`
-              : formatDashboardEventDate(nextOnline, timezone) ?? "Schneller Zugriff auf den Kalender."}
-          </span>
-          <Button asChild className="h-7 rounded-lg px-2.5 text-[11px]" size="sm">
-            <Link href="/events/new">+ Termin</Link>
-          </Button>
-        </CardContent>
-      </Card>
+    <section className="overflow-hidden rounded-[0.95rem] border border-black/6 bg-white/88">
+      <div className="overflow-x-auto">
+        <div className="flex min-w-[920px] divide-x divide-black/6">
+          {items.map((item) => (
+            <div className="flex min-w-[184px] flex-1 flex-col gap-1 px-3 py-2.5" key={item.label}>
+              <div className="flex items-center gap-2">
+                <span className={`h-1.5 w-1.5 rounded-full ${item.accentClass}`} />
+                <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  {item.label}
+                </p>
+              </div>
+              <p className="text-[13px] font-semibold tracking-tight text-foreground">{item.value}</p>
+              <p className="truncate text-[10px] leading-4 text-muted-foreground">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

@@ -10,6 +10,7 @@ import { CalendarToolbar } from "@/components/calendar/calendar-toolbar";
 import { DayView } from "@/components/calendar/day-view";
 import { MonthView } from "@/components/calendar/month-view";
 import { WeekView } from "@/components/calendar/week-view";
+import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 
 type CalendarManagerProps = {
   timezone: string;
@@ -94,14 +95,16 @@ export function CalendarManager({ timezone }: CalendarManagerProps) {
         view={view}
       />
 
+      <DashboardOverview timezone={timezone} />
+
       {error ? (
-        <div className="rounded-[1.25rem] border border-destructive/20 bg-destructive/5 px-4 py-6 text-xs text-destructive">
+        <div className="rounded-[0.9rem] border border-destructive/15 bg-destructive/[0.04] px-3 py-3 text-[11px] text-destructive">
           {error}
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="rounded-[1.25rem] border border-white/70 bg-card/90 px-4 py-6 text-xs text-muted-foreground">
+        <div className="rounded-[0.9rem] border border-black/6 bg-white/88 px-3 py-3 text-[11px] text-muted-foreground">
           Kalenderdaten werden geladen...
         </div>
       ) : view === "day" ? (

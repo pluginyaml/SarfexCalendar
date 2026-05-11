@@ -13,12 +13,12 @@ export function MobileNav() {
     <>
       <Link
         href="/events/new"
-        className="fixed bottom-20 right-3 z-40 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 md:hidden"
+        className="fixed bottom-20 right-3 z-40 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_12px_28px_rgba(15,23,42,0.12)] md:hidden"
       >
         <Plus className="size-5" />
       </Link>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-white/60 bg-white/88 px-2.5 py-2 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-black/6 bg-white/90 px-2.5 py-2 backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-1.5">
           {mobileNavigation.map((item) => {
             const isActive =

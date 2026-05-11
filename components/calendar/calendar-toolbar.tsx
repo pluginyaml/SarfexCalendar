@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { format, endOfWeek, startOfWeek } from "date-fns";
 import { de } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,6 +15,18 @@ type CalendarToolbarProps = {
   onNext: () => void;
   onToday: () => void;
 };
+
+function getViewLabel(view: DefaultView) {
+  if (view === "day") {
+    return "Tag";
+  }
+
+  if (view === "week") {
+    return "Woche";
+  }
+
+  return "Monat";
+}
 
 function getPeriodLabel(view: DefaultView, currentDate: Date) {
   if (view === "day") {
@@ -38,58 +51,57 @@ export function CalendarToolbar({
   onToday,
 }: CalendarToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-[1.25rem] border border-white/70 bg-card/90 p-3 lg:flex-row lg:items-center lg:justify-between">
-      <div className="space-y-1">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Kalender
-        </p>
-        <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-          {getPeriodLabel(view, currentDate)}
-        </h2>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2">
-          <Button
-            className="size-8 rounded-lg"
-            onClick={onPrevious}
-            size="icon"
-            type="button"
-            variant="outline"
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-          <Button
-            className="h-8 rounded-lg px-3 text-[11px]"
-            onClick={onToday}
-            size="sm"
-            type="button"
-            variant="secondary"
-          >
-            Heute
-          </Button>
-          <Button
-            className="size-8 rounded-lg"
-            onClick={onNext}
-            size="icon"
-            type="button"
-            variant="outline"
-          >
-            <ChevronRight className="size-4" />
-          </Button>
+    <div className="flex flex-col gap-2 rounded-[1rem] border border-black/6 bg-white/90 px-3 py-2">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            Kalender
+          </p>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <h1 className="text-[15px] font-semibold tracking-tight text-foreground">
+              {getViewLabel(view)}
+            </h1>
+            <p className="text-[12px] text-muted-foreground">{getPeriodLabel(view, currentDate)}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-1 rounded-xl bg-secondary/90 p-0.5">
-          {(["day", "week", "month"] as const).map((value) => (
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex items-center gap-1">
+            <Button className="rounded-[0.7rem]" onClick={onPrevious} size="icon" type="button" variant="outline">
+              <ChevronLeft className="size-3.5" />
+            </Button>
             <Button
-              className="h-7 rounded-lg px-2.5 text-[11px]"
-              key={value}
-              onClick={() => onViewChange(value)}
+              className="rounded-[0.7rem] px-2.5 text-[11px]"
+              onClick={onToday}
               size="sm"
               type="button"
-              variant={view === value ? "default" : "ghost"}
+              variant="outline"
             >
-              {value === "day" ? "Tag" : value === "week" ? "Woche" : "Monat"}
+              Heute
             </Button>
-          ))}
+            <Button className="rounded-[0.7rem]" onClick={onNext} size="icon" type="button" variant="outline">
+              <ChevronRight className="size-3.5" />
+            </Button>
+          </div>
+
+          <div className="flex items-center rounded-[0.75rem] bg-black/[0.035] p-0.5">
+            {(["day", "week", "month"] as const).map((value) => (
+              <Button
+                className="h-7 rounded-[0.6rem] px-2.5 text-[11px]"
+                key={value}
+                onClick={() => onViewChange(value)}
+                size="sm"
+                type="button"
+                variant={view === value ? "default" : "ghost"}
+              >
+                {value === "day" ? "Tag" : value === "week" ? "Woche" : "Monat"}
+              </Button>
+            ))}
+          </div>
+
+          <Button asChild className="rounded-[0.7rem] px-2.5 text-[11px]" size="sm">
+            <Link href="/events/new">+ Termin</Link>
+          </Button>
         </div>
       </div>
     </div>

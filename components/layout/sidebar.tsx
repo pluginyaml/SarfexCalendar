@@ -26,7 +26,7 @@ export function Sidebar({ userEmail }: SidebarProps) {
       <button
         aria-expanded={isOpen}
         aria-label="Navigation anzeigen"
-        className="absolute left-2 top-2 z-50 flex size-7 items-center justify-center rounded-xl border border-white/70 bg-white/88 text-foreground shadow-sm backdrop-blur transition hover:bg-white"
+        className="absolute left-2 top-2 z-50 flex size-7 items-center justify-center rounded-[0.75rem] border border-black/6 bg-white/80 text-foreground/80 backdrop-blur transition-all duration-200 hover:bg-white"
         onClick={() => setIsOpen((current) => !current)}
         onFocus={() => setIsOpen(true)}
         onMouseEnter={() => setIsOpen(true)}
@@ -39,13 +39,13 @@ export function Sidebar({ userEmail }: SidebarProps) {
 
       <aside
         className={cn(
-          "absolute inset-y-0 left-0 flex w-60 flex-col border-r border-black/5 bg-white/88 px-3 py-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-200 ease-out",
+          "absolute inset-y-0 left-0 flex w-56 flex-col border-r border-black/6 bg-white/86 px-3 py-3 shadow-[0_20px_50px_rgba(15,23,42,0.06)] backdrop-blur-2xl transition duration-300 ease-out",
           isOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
         )}
         onMouseEnter={() => setIsOpen(true)}
       >
         <div className="mb-4 flex items-center gap-2.5 pl-8">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20">
+          <div className="flex size-8 items-center justify-center rounded-[0.8rem] bg-foreground text-background">
             <CalendarDays className="size-4" />
           </div>
           <div>
@@ -56,7 +56,7 @@ export function Sidebar({ userEmail }: SidebarProps) {
           </div>
         </div>
 
-        <Button asChild className="mb-4 h-9 w-full justify-center rounded-xl text-xs">
+        <Button asChild className="mb-4 h-8 w-full justify-center rounded-[0.75rem] text-[11px]">
           <Link href="/events/new" onClick={() => setIsOpen(false)}>
             + Termin
           </Link>
@@ -75,10 +75,10 @@ export function Sidebar({ userEmail }: SidebarProps) {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                    "flex items-center gap-2 rounded-[0.75rem] px-2.5 py-1.5 text-[11px] font-medium transition-colors",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/15"
-                      : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground",
+                      ? "bg-black/[0.045] text-foreground"
+                      : "text-muted-foreground hover:bg-black/[0.035] hover:text-foreground",
                   )}
                 >
                   <item.icon className="size-3.5" />
@@ -89,12 +89,12 @@ export function Sidebar({ userEmail }: SidebarProps) {
           </nav>
         </ScrollArea>
 
-        <div className="mt-4 rounded-[1.1rem] border border-white/70 bg-white/72 p-3">
+        <div className="mt-4 rounded-[0.85rem] border border-black/6 bg-white/70 p-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Eingeloggt als
           </p>
           <p className="mt-1 truncate text-xs font-semibold text-foreground">{userEmail}</p>
-          <LogoutButton className="mt-3 h-8 w-full rounded-xl text-xs" />
+          <LogoutButton className="mt-3 h-8 w-full rounded-[0.75rem] text-[11px]" />
         </div>
       </aside>
     </div>
