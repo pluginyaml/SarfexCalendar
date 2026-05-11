@@ -107,7 +107,7 @@ export function CalendarToolbar({
           >
             <Link href="/events/new">
               <Plus className="size-3.5 shrink-0" />
-              <span className="truncate">+ Termin</span>
+              <span className="truncate">Termin</span>
             </Link>
           </Button>
         </div>

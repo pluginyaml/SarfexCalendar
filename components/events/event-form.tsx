@@ -193,7 +193,7 @@ export function EventForm({
 
     if (!values.category) {
       return {
-        error: "Bitte waehle eine Kategorie.",
+        error: "Bitte wähle eine Kategorie.",
       };
     }
 
@@ -211,7 +211,7 @@ export function EventForm({
 
     if (values.allDay && values.endDate < values.startDate) {
       return {
-        error: "Das Enddatum muss am selben Tag oder spaeter liegen.",
+        error: "Das Enddatum muss am selben Tag oder später liegen.",
       };
     }
 
@@ -251,7 +251,7 @@ export function EventForm({
     const result = validateAndBuildPayload();
 
     if ("error" in result) {
-      setError(result.error ?? "Bitte pruefe deine Eingaben.");
+      setError(result.error ?? "Bitte prüfe deine Eingaben.");
       return;
     }
 
@@ -275,7 +275,7 @@ export function EventForm({
       setIsDeleteDialogOpen(false);
     } catch (deleteError) {
       toast.error(
-        deleteError instanceof Error ? deleteError.message : "Termin konnte nicht geloescht werden.",
+        deleteError instanceof Error ? deleteError.message : "Termin konnte nicht gelöscht werden.",
       );
     }
   };
@@ -286,7 +286,7 @@ export function EventForm({
         <CardHeader>
           <CardTitle>{mode === "create" ? "Neuen Termin anlegen" : "Termin bearbeiten"}</CardTitle>
           <CardDescription>
-            Echte Termine werden direkt ueber Nextcloud CalDAV gespeichert. Lokal bleiben nur deine Metadaten.
+            Echte Termine werden direkt über Nextcloud CalDAV gespeichert. Lokal bleiben nur deine Metadaten.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -296,7 +296,7 @@ export function EventForm({
                 <Label>Terminvorlage</Label>
                 <Select onValueChange={applyEventTemplate} value={values.templateId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Optional aus Vorlage fuellen" />
+                    <SelectValue placeholder="Optional aus Vorlage füllen" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={NONE_OPTION}>Keine Vorlage</SelectItem>
@@ -331,7 +331,7 @@ export function EventForm({
                   value={values.category}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Kategorie waehlen" />
+                    <SelectValue placeholder="Kategorie wählen" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -503,7 +503,7 @@ export function EventForm({
                   type="button"
                   variant="outline"
                 >
-                  Termin loeschen
+                  Termin löschen
                 </Button>
               ) : (
                 <span className="text-sm text-muted-foreground">
@@ -515,7 +515,7 @@ export function EventForm({
                   ? "Speichert..."
                   : mode === "create"
                     ? "Termin speichern"
-                    : "Aenderungen speichern"}
+                    : "Änderungen speichern"}
               </Button>
             </div>
           </form>

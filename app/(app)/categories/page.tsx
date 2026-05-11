@@ -11,7 +11,7 @@ export default function CategoriesPage() {
       <Header
         eyebrow="Kategorien"
         title="Farben, Icons und Standarderinnerungen"
-        description="Hier verwaltest du die lokalen Metadaten, die spaeter Terminfarbe, Icon, Dauer und Reminder vorgeben."
+        description="Hier verwaltest du die lokalen Metadaten, die später Terminfarbe, Icon, Dauer und Reminder vorgeben."
       />
       <CategoryManager />
     </div>

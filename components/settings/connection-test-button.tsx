@@ -26,7 +26,7 @@ export function ConnectionTestButton({
       variant="secondary"
     >
       {isPending ? <Loader2 className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
-      {isPending ? "Prueft..." : "Verbindung testen"}
+      {isPending ? "Prüft..." : "Verbindung testen"}
     </Button>
   );
 }

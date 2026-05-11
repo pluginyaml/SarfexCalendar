@@ -42,10 +42,10 @@ export function SettingsManager() {
     "pending",
   );
   const [connectionMessage, setConnectionMessage] = useState(
-    "Noch kein Live-Verbindungstest ausgefuehrt",
+    "Noch kein Live-Verbindungstest ausgeführt",
   );
   const [connectionDetail, setConnectionDetail] = useState(
-    "Die Verbindung zu Nextcloud laesst sich hier direkt gegen den konfigurierten CalDAV-Kalender pruefen.",
+    "Die Verbindung zu Nextcloud lässt sich hier direkt gegen den konfigurierten CalDAV-Kalender prüfen.",
   );
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,7 +135,7 @@ export function SettingsManager() {
       const message =
         testError instanceof Error
           ? testError.message
-          : "CalDAV-Verbindung konnte nicht geprueft werden.";
+          : "CalDAV-Verbindung konnte nicht geprüft werden.";
 
       setConnectionStatus("error");
       setConnectionMessage("Verbindungstest fehlgeschlagen");
@@ -171,7 +171,7 @@ export function SettingsManager() {
       <Card className="card-shadow border-white/70 bg-card/90">
         <CardHeader>
           <CardTitle>UI-Einstellungen</CardTitle>
-          <CardDescription>Diese Daten werden lokal gespeichert und beeinflussen spaeter die Kalenderansichten.</CardDescription>
+          <CardDescription>Diese Daten werden lokal gespeichert und beeinflussen später die Kalenderansichten.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit}>
@@ -183,7 +183,7 @@ export function SettingsManager() {
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Ansicht waehlen" />
+                      <SelectValue placeholder="Ansicht wählen" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="day">Tag</SelectItem>
@@ -205,7 +205,7 @@ export function SettingsManager() {
                     value={String(field.value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Tag waehlen" />
+                      <SelectValue placeholder="Tag wählen" />
                     </SelectTrigger>
                     <SelectContent>
                       {weekOptions.map((option) => (

@@ -102,7 +102,7 @@ export function CategoryForm({
       <CardHeader>
         <CardTitle>{category ? "Kategorie bearbeiten" : "Neue Kategorie"}</CardTitle>
         <CardDescription>
-          Farben, Icons und Standard-Erinnerungen bestimmen spaeter die Event-Darstellung.
+          Farben, Icons und Standard-Erinnerungen bestimmen später die Event-Darstellung.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -127,7 +127,7 @@ export function CategoryForm({
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Icon waehlen" />
+                      <SelectValue placeholder="Icon wählen" />
                     </SelectTrigger>
                     <SelectContent>
                       {categoryIconOptions.map((option) => (
@@ -177,7 +177,7 @@ export function CategoryForm({
             <div>
               <p className="font-medium">Aktiv</p>
               <p className="text-sm text-muted-foreground">
-                Inaktive Kategorien bleiben erhalten, werden aber spaeter im Formular abgewertet.
+                Inaktive Kategorien bleiben erhalten, werden aber später im Formular abgewertet.
               </p>
             </div>
             <Controller
@@ -192,7 +192,7 @@ export function CategoryForm({
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             {category ? (
               <Button onClick={() => onDelete(category)} type="button" variant="outline">
-                Loeschen
+                Löschen
               </Button>
             ) : (
               <span className="text-sm text-muted-foreground">

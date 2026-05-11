@@ -69,14 +69,18 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
           <div className="max-h-[70vh] overflow-y-auto">
             <div className="grid grid-cols-[64px_repeat(7,minmax(0,1fr))]">
               <div className="relative border-r border-black/6">
-              {hours.map((hour) => (
-                <div className="relative border-b border-black/[0.05]" key={hour} style={{ height: HOUR_ROW_HEIGHT }}>
-                  <span className="absolute -top-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
-                    {`${hour}:00`}
-                  </span>
-                </div>
-              ))}
-                <span className="absolute -bottom-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
+                {hours.map((hour) => (
+                  <div
+                    className="relative border-b border-black/[0.05]"
+                    key={hour}
+                    style={{ height: HOUR_ROW_HEIGHT }}
+                  >
+                    <span className="absolute right-2 top-1 bg-white px-1 text-[10px] text-muted-foreground">
+                      {`${hour}:00`}
+                    </span>
+                  </div>
+                ))}
+                <span className="absolute bottom-1 right-2 bg-white px-1 text-[10px] text-muted-foreground">
                   24:00
                 </span>
               </div>

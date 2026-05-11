@@ -63,7 +63,7 @@ export function Sidebar({ userEmail }: SidebarProps) {
         >
           <Link href="/events/new" onClick={() => setIsOpen(false)}>
             <Plus className="size-3.5 shrink-0" />
-            <span className="truncate">+ Termin</span>
+            <span className="truncate">Termin</span>
           </Link>
         </Button>
 

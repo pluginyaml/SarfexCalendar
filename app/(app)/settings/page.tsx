@@ -11,7 +11,7 @@ export default function SettingsPage() {
       <Header
         eyebrow="Einstellungen"
         title="CalDAV-Verbindung und UI-Vorgaben"
-        description="Hier landen der spaetere Verbindungstest, Standardansicht, Wochenstart und die Zeitzone Europe/Berlin."
+        description="Hier landen der spätere Verbindungstest, die Standardansicht, der Wochenstart und die Zeitzone Europe/Berlin."
       />
       <SettingsManager />
     </div>

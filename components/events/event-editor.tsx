@@ -183,7 +183,7 @@ export function EventEditor({ mode, eventId, timezone }: EventEditorProps) {
         }),
       });
 
-      toast.success("Termin geloescht.");
+      toast.success("Termin gelöscht.");
       router.replace("/events");
       router.refresh();
     } finally {

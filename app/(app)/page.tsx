@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 const focusItems = [
-  "CalDAV bleibt die einzige Quelle der Wahrheit fuer echte Termine.",
-  "Kategorien, Vorlagen und Orte werden lokal gepflegt und ergaenzen den Kalender.",
-  "Aenderungen erscheinen direkt in Nextcloud und auf verbundenen Geraeten.",
+  "CalDAV bleibt die einzige Quelle der Wahrheit für echte Termine.",
+  "Kategorien, Vorlagen und Orte werden lokal gepflegt und ergänzen den Kalender.",
+  "Änderungen erscheinen direkt in Nextcloud und auf verbundenen Geräten.",
 ];
 
 const workflowItems = [
   "Termin anlegen oder bearbeiten",
-  "Naechste Pruefung und Onlineeinheit ueberblicken",
+  "Nächste Prüfung und Onlineeinheit überblicken",
   "Deadlines und heutige Termine mit einem Blick erfassen",
 ];
 
@@ -23,12 +23,12 @@ export default function DashboardPage() {
       <Header
         eyebrow="Dashboard"
         title="Kontrollzentrum"
-        description="Ein ruhiger Ueberblick ueber die naechsten Termine, Sync-Status und deinen aktuellen Fokus."
+        description="Ein ruhiger Überblick über die nächsten Termine, den Sync-Status und deinen aktuellen Fokus."
         actions={
           <Button asChild className="rounded-[0.7rem] px-2.5 text-[11px] text-foreground" size="sm" variant="outline">
             <Link href="/events/new">
               <Plus className="size-3.5 shrink-0" />
-              <span className="truncate">+ Termin</span>
+              <span className="truncate">Termin</span>
             </Link>
           </Button>
         }

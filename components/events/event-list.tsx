@@ -17,7 +17,7 @@ export function EventList({ events, timezone }: EventListProps) {
   if (events.length === 0) {
     return (
       <div className="rounded-[1.75rem] border border-dashed border-border bg-card/90 px-5 py-10 text-sm text-muted-foreground">
-        Keine Termine im gewaehlten Zeitraum gefunden.
+        Keine Termine im gewählten Zeitraum gefunden.
       </div>
     );
   }

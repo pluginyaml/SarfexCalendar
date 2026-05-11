@@ -117,7 +117,7 @@ export function EventTemplateManager() {
   };
 
   const handleDelete = async (template: EventTemplateRecord) => {
-    const confirmed = window.confirm(`Vorlage "${template.name}" wirklich loeschen?`);
+    const confirmed = window.confirm(`Vorlage "${template.name}" wirklich löschen?`);
 
     if (!confirmed) {
       return;
@@ -129,7 +129,7 @@ export function EventTemplateManager() {
       await requestJson<{ id: string }>(`/api/templates/${template.id}`, {
         method: "DELETE",
       });
-      toast.success("Vorlage geloescht.");
+      toast.success("Vorlage gelöscht.");
       setSelectedTemplateId(null);
       await loadData();
     } catch (deleteError) {

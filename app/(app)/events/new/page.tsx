@@ -12,7 +12,7 @@ export default function NewEventPage() {
       <Header
         eyebrow="Neuer Termin"
         title="Terminformular vorbereiten"
-        description="Pflichtfelder, All-Day-Handling, Vorlagen, Standorte und Erinnerungen werden direkt in einen echten CalDAV-Termin geschrieben."
+        description="Pflichtfelder, Ganztag-Handling, Vorlagen, Standorte und Erinnerungen werden direkt in einen echten CalDAV-Termin geschrieben."
       />
       <EventEditor mode="create" timezone={DEFAULT_TIMEZONE} />
     </div>

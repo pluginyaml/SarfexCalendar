@@ -85,7 +85,7 @@ export function LocationTemplateForm({
       <CardHeader>
         <CardTitle>{location ? "Standort bearbeiten" : "Neuer Standort"}</CardTitle>
         <CardDescription>
-          Adressen werden spaeter nach LOCATION uebernommen, Beschreibung und Link koennen in DESCRIPTION einfliessen.
+          Adressen werden später nach LOCATION übernommen, Beschreibung und Link können in DESCRIPTION einfließen.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -127,7 +127,7 @@ export function LocationTemplateForm({
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             {location ? (
               <Button onClick={() => onDelete(location)} type="button" variant="outline">
-                Loeschen
+                Löschen
               </Button>
             ) : (
               <span className="text-sm text-muted-foreground">

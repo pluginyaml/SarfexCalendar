@@ -11,7 +11,7 @@ export default function TemplatesPage() {
       <Header
         eyebrow="Terminvorlagen"
         title="Wiederkehrende Muster vorbereiten"
-        description="Vorlagen werden lokal in PostgreSQL gespeichert und spaeter direkt in das Event-Formular uebernommen."
+        description="Vorlagen werden lokal in PostgreSQL gespeichert und später direkt in das Event-Formular übernommen."
       />
       <EventTemplateManager />
     </div>

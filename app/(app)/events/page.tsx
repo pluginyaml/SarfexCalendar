@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { EventsManager } from "@/components/events/events-manager";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,13 @@ export default function EventsPage() {
       <Header
         eyebrow="Termine"
         title="Chronologische Listenansicht"
-        description="Die Liste zeigt standardmaessig die naechsten sechs Monate und laesst sich nach Text, Kategorie und Standort filtern."
+        description="Die Liste zeigt standardmäßig die nächsten sechs Monate und lässt sich nach Text, Kategorie und Standort filtern."
         actions={
-          <Button asChild>
-            <Link href="/events/new">+ Termin</Link>
+          <Button asChild className="gap-1.5">
+            <Link href="/events/new">
+              <Plus className="size-4" />
+              Termin
+            </Link>
           </Button>
         }
       />

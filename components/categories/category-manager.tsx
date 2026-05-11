@@ -104,7 +104,7 @@ export function CategoryManager() {
   };
 
   const handleDelete = async (category: CategoryRecord) => {
-    const confirmed = window.confirm(`Kategorie "${category.name}" wirklich loeschen?`);
+    const confirmed = window.confirm(`Kategorie "${category.name}" wirklich löschen?`);
 
     if (!confirmed) {
       return;
@@ -116,7 +116,7 @@ export function CategoryManager() {
       await requestJson<{ id: string }>(`/api/categories/${category.id}`, {
         method: "DELETE",
       });
-      toast.success("Kategorie geloescht.");
+      toast.success("Kategorie gelöscht.");
       setSelectedCategoryId(null);
       await loadCategories();
     } catch (deleteError) {

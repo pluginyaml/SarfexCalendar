@@ -11,7 +11,7 @@ export default function LocationsPage() {
       <Header
         eyebrow="Standortvorlagen"
         title="Adressen und Standardtexte zentral pflegen"
-        description="Standortvorlagen landen lokal in PostgreSQL und koennen spaeter DESCRIPTION und LOCATION fuer Events vorbelegen."
+        description="Standortvorlagen landen lokal in PostgreSQL und können später DESCRIPTION und LOCATION für Events vorbelegen."
       />
       <LocationTemplateManager />
     </div>

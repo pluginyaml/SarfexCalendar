@@ -79,7 +79,7 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
     };
   }, [timezone]);
 
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKey = useMemo(() => formatInTimeZone(new Date(), timezone, "yyyy-MM-dd"), [timezone]);
   const todayEvents = useMemo(
     () => events.filter((event) => eventOccursOnDate(event, todayKey, timezone)),
     [events, timezone, todayKey],
@@ -105,13 +105,13 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
       accentClass: "bg-foreground/70",
     },
     {
-      label: "Naechste Pruefung",
+      label: "Nächste Prüfung",
       value: isLoading ? "..." : formatEventValue(nextExam, timezone),
       detail: formatEventDetail(nextExam),
       accentClass: "bg-rose-500/70",
     },
     {
-      label: "Naechste Onlineeinheit",
+      label: "Nächste Onlineeinheit",
       value: isLoading ? "..." : formatEventValue(nextOnline, timezone),
       detail: formatEventDetail(nextOnline),
       accentClass: "bg-sky-500/70",
@@ -124,7 +124,7 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
     },
     {
       label: "CalDAV",
-      value: error ? "Stoerung" : isLoading ? "Pruefe..." : "Verbunden",
+      value: error ? "Störung" : isLoading ? "Prüfe..." : "Verbunden",
       detail: error ?? "Nextcloud ist die einzige Quelle der Wahrheit",
       accentClass: error ? "bg-rose-500/70" : "bg-emerald-500/70",
     },

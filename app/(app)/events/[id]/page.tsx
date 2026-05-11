@@ -16,7 +16,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <Header
         eyebrow="Termin bearbeiten"
         title="Detailansicht"
-        description={`Die Event-Bearbeitung fuer "${id}" ist ueber href und ETag konfliktgesichert.`}
+        description={`Die Event-Bearbeitung für "${id}" ist über href und ETag konfliktgesichert.`}
       />
       <EventEditor eventId={id} mode="edit" timezone={DEFAULT_TIMEZONE} />
     </div>

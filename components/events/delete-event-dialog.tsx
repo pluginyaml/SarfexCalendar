@@ -30,15 +30,15 @@ export function DeleteEventDialog({
     <AlertDialog onOpenChange={onOpenChange} open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Termin loeschen?</AlertDialogTitle>
+          <AlertDialogTitle>Termin löschen?</AlertDialogTitle>
           <AlertDialogDescription>
-            &quot;{title}&quot; wird direkt in Nextcloud geloescht und verschwindet danach auch aus iPhone und anderen CalDAV-Clients.
+            &quot;{title}&quot; wird direkt in Nextcloud gelöscht und verschwindet danach auch aus iPhone und anderen CalDAV-Clients.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Abbrechen</AlertDialogCancel>
           <AlertDialogAction disabled={isPending} onClick={onConfirm}>
-            {isPending ? "Loescht..." : "Termin loeschen"}
+            {isPending ? "Löscht..." : "Termin löschen"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -145,7 +145,7 @@ export function EventTemplateForm({
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Kategorie waehlen" />
+                      <SelectValue placeholder="Kategorie wählen" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -208,8 +208,8 @@ export function EventTemplateForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between rounded-2xl border border-border bg-white/70 px-4 py-3">
               <div>
-                <p className="font-medium">Ganztag standardmaessig</p>
-                <p className="text-sm text-muted-foreground">Fuer Deadlines oder reine Tagesmarker.</p>
+                <p className="font-medium">Ganztag standardmäßig</p>
+                <p className="text-sm text-muted-foreground">Für Deadlines oder reine Tagesmarker.</p>
               </div>
               <Controller
                 control={form.control}
@@ -222,7 +222,7 @@ export function EventTemplateForm({
             <div className="flex items-center justify-between rounded-2xl border border-border bg-white/70 px-4 py-3">
               <div>
                 <p className="font-medium">Aktiv</p>
-                <p className="text-sm text-muted-foreground">Nur aktive Vorlagen sollen spaeter prominent erscheinen.</p>
+                <p className="text-sm text-muted-foreground">Nur aktive Vorlagen sollen später prominent erscheinen.</p>
               </div>
               <Controller
                 control={form.control}
@@ -237,11 +237,11 @@ export function EventTemplateForm({
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             {template ? (
               <Button onClick={() => onDelete(template)} type="button" variant="outline">
-                Loeschen
+                Löschen
               </Button>
             ) : (
               <span className="text-sm text-muted-foreground">
-                Vorlagen fuellen spaeter Terminformulare automatisch vor.
+                Vorlagen füllen später Terminformulare automatisch vor.
               </span>
             )}
             <Button disabled={isSaving} type="submit">

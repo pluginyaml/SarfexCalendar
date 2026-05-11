@@ -25,7 +25,7 @@ export function LocationTemplateList({
       <CardHeader className="flex flex-row items-start justify-between gap-3">
         <div className="space-y-1">
           <CardTitle>Standortvorlagen</CardTitle>
-          <CardDescription>Adressen, Links und Beschreibungstexte fuer Praesenztermine.</CardDescription>
+          <CardDescription>Adressen, Links und Beschreibungstexte für Präsenztermine.</CardDescription>
         </div>
         <Button onClick={onCreate} size="sm" type="button" variant="secondary">
           <Plus className="size-4" />

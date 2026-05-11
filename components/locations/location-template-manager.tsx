@@ -95,7 +95,7 @@ export function LocationTemplateManager() {
   };
 
   const handleDelete = async (location: LocationTemplateRecord) => {
-    const confirmed = window.confirm(`Standort "${location.name}" wirklich loeschen?`);
+    const confirmed = window.confirm(`Standort "${location.name}" wirklich löschen?`);
 
     if (!confirmed) {
       return;
@@ -107,7 +107,7 @@ export function LocationTemplateManager() {
       await requestJson<{ id: string }>(`/api/locations/${location.id}`, {
         method: "DELETE",
       });
-      toast.success("Standort geloescht.");
+      toast.success("Standort gelöscht.");
       setSelectedLocationId(null);
       await loadLocations();
     } catch (deleteError) {
