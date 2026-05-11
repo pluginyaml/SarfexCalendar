@@ -4,6 +4,11 @@ import { redirect } from "next/navigation";
 import { type NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import {
+  decodeBase64UrlToUtf8,
+  encodeBase64ToBase64Url,
+  encodeUtf8ToBase64Url,
+} from "@/lib/base64url";
 import { describeAuthString, logAuthDebug } from "@/lib/server/auth/debug";
 import { readRuntimeEnv, requireRuntimeEnv } from "@/lib/server/env/runtime";
 import { AppError } from "@/lib/server/errors";
@@ -22,7 +27,9 @@ export const SESSION_COOKIE_NAME = "sarfex_admin_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 14;
 
 function signPayload(payload: string, secret: string) {
-  return createHmac("sha256", secret).update(payload).digest("base64url");
+  return encodeBase64ToBase64Url(
+    createHmac("sha256", secret).update(payload).digest("base64"),
+  );
 }
 
 function createSessionToken(email: string) {
@@ -31,7 +38,7 @@ function createSessionToken(email: string) {
     email,
     exp: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
   };
-  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const encodedPayload = encodeUtf8ToBase64Url(JSON.stringify(payload));
   const signature = signPayload(encodedPayload, APP_SECRET);
 
   return `${encodedPayload}.${signature}`;
@@ -67,9 +74,7 @@ function verifySessionToken(token?: string | null): AdminSession | null {
   }
 
   try {
-    const parsed = sessionPayloadSchema.parse(
-      JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8")),
-    );
+    const parsed = sessionPayloadSchema.parse(JSON.parse(decodeBase64UrlToUtf8(encodedPayload)));
 
     if (parsed.exp <= Date.now()) {
       return null;
