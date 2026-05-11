@@ -18,23 +18,23 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   return (
-    <div className="overflow-x-auto rounded-[1.75rem] border border-white/70 bg-card/75 p-3">
-      <div className="grid min-w-[840px] gap-3 md:grid-cols-7">
+    <div className="overflow-x-auto rounded-[1.35rem] border border-white/70 bg-card/75 p-2">
+      <div className="grid min-w-[760px] gap-2 md:grid-cols-7">
         {days.map((day) => {
           const dateKey = format(day, "yyyy-MM-dd");
           const dayEvents = events.filter((event) => eventOccursOnDate(event, dateKey, timezone));
 
           return (
-            <Card className="border-border/60 bg-white/85 shadow-sm" key={dateKey}>
-              <CardHeader className="space-y-1 border-b border-border/50 pb-4">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            <Card className="min-h-[24rem] border-border/60 bg-white/85 shadow-sm" key={dateKey}>
+              <CardHeader className="space-y-1 border-b border-border/50 pb-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                   {format(day, "EEE")}
                 </p>
-                <CardTitle className="text-base">{format(day, "dd.MM")}</CardTitle>
+                <CardTitle className="text-sm">{format(day, "dd.MM")}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1.5 pt-4">
+              <CardContent className="space-y-1 pt-3">
                 {dayEvents.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">Keine Termine</p>
+                  <p className="text-[11px] text-muted-foreground">Keine Termine</p>
                 ) : (
                   dayEvents.map((event) => (
                     <EventBlock compact event={event} key={`${event.href}-${event.etag}-${dateKey}`} timezone={timezone} />

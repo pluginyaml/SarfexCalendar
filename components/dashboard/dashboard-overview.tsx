@@ -72,50 +72,50 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
   const nextOnline = events.find((event) => event.category === "Onlineeinheit") ?? null;
 
   return (
-    <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-4">
       <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 pb-2">
           <CardDescription>Heute</CardDescription>
-          <CardTitle>{isLoading ? "Laden..." : `${todayEvents.length} Termine`}</CardTitle>
+          <CardTitle className="text-base">{isLoading ? "Laden..." : `${todayEvents.length} Termine`}</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
+        <CardContent className="text-xs leading-5 text-muted-foreground">
           {todayEvents[0]?.title ?? "Heute ist noch nichts geplant."}
         </CardContent>
       </Card>
 
       <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 pb-2">
           <CardDescription>Naechste 14 Tage</CardDescription>
-          <CardTitle>{isLoading ? "Laden..." : `${events.length} Termine`}</CardTitle>
+          <CardTitle className="text-base">{isLoading ? "Laden..." : `${events.length} Termine`}</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
+        <CardContent className="text-xs leading-5 text-muted-foreground">
           Ein kompakter Blick auf die direkt bevorstehenden Einheiten, Deadlines und Praesenztermine.
         </CardContent>
       </Card>
 
       <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 pb-2">
           <CardDescription>Naechste Pruefung</CardDescription>
-          <CardTitle>{nextExam?.title ?? "Noch keine Pruefung gefunden"}</CardTitle>
+          <CardTitle className="text-base">{nextExam?.title ?? "Noch keine Pruefung gefunden"}</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-muted-foreground">
+        <CardContent className="text-xs leading-5 text-muted-foreground">
           {formatDashboardEventDate(nextExam, timezone) ??
             "Sobald CalDAV Daten liefert, wird hier die naechste Pruefung hervorgehoben."}
         </CardContent>
       </Card>
 
       <Card className="border-border/60 bg-white/85 shadow-sm">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 pb-2">
           <CardDescription>Naechste Onlineeinheit</CardDescription>
-          <CardTitle>{nextOnline?.title ?? "Noch keine Onlineeinheit gefunden"}</CardTitle>
+          <CardTitle className="text-base">{nextOnline?.title ?? "Noch keine Onlineeinheit gefunden"}</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-between gap-3 text-sm leading-6 text-muted-foreground">
+        <CardContent className="flex items-center justify-between gap-2 text-xs leading-5 text-muted-foreground">
           <span>
             {error
               ? `CalDAV-Hinweis: ${error}`
               : formatDashboardEventDate(nextOnline, timezone) ?? "Schneller Zugriff auf den Kalender."}
           </span>
-          <Button asChild size="sm">
+          <Button asChild className="h-7 rounded-lg px-2.5 text-[11px]" size="sm">
             <Link href="/events/new">+ Termin</Link>
           </Button>
         </CardContent>

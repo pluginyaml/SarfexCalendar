@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function CalendarPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Header
         eyebrow="Kalender"
         title="Tages-, Wochen- und Monatsansicht"

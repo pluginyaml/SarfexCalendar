@@ -38,28 +38,49 @@ export function CalendarToolbar({
   onToday,
 }: CalendarToolbarProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-card/90 p-5 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-3 rounded-[1.25rem] border border-white/70 bg-card/90 p-3 lg:flex-row lg:items-center lg:justify-between">
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Kalender
         </p>
-        <h2 className="text-2xl font-semibold tracking-tight">{getPeriodLabel(view, currentDate)}</h2>
+        <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
+          {getPeriodLabel(view, currentDate)}
+        </h2>
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2">
-          <Button onClick={onPrevious} size="icon" type="button" variant="outline">
+          <Button
+            className="size-8 rounded-lg"
+            onClick={onPrevious}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
             <ChevronLeft className="size-4" />
           </Button>
-          <Button onClick={onToday} type="button" variant="secondary">
+          <Button
+            className="h-8 rounded-lg px-3 text-[11px]"
+            onClick={onToday}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
             Heute
           </Button>
-          <Button onClick={onNext} size="icon" type="button" variant="outline">
+          <Button
+            className="size-8 rounded-lg"
+            onClick={onNext}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
             <ChevronRight className="size-4" />
           </Button>
         </div>
-        <div className="flex items-center gap-2 rounded-2xl bg-secondary p-1">
+        <div className="flex items-center gap-1 rounded-xl bg-secondary/90 p-0.5">
           {(["day", "week", "month"] as const).map((value) => (
             <Button
+              className="h-7 rounded-lg px-2.5 text-[11px]"
               key={value}
               onClick={() => onViewChange(value)}
               size="sm"

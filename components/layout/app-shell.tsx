@@ -11,11 +11,9 @@ export function AppShell({
   return (
     <div className="min-h-screen">
       <Sidebar userEmail={userEmail} />
-      <div className="min-h-screen pl-0 md:pl-72">
-        <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-28 pt-6 sm:px-6 md:px-8 md:pb-10 md:pt-8">
-          {children}
-        </main>
-      </div>
+      <main className="mx-auto flex min-h-screen w-full max-w-none flex-col px-3 pb-24 pt-3 sm:px-4 md:px-5 md:pb-8 md:pt-4 xl:px-6">
+        {children}
+      </main>
       <MobileNav />
     </div>
   );

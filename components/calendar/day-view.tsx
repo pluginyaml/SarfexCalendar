@@ -17,14 +17,14 @@ export function DayView({ currentDate, events, timezone }: DayViewProps) {
   const dayEvents = events.filter((event) => eventOccursOnDate(event, dateKey, timezone));
 
   return (
-    <Card className="card-shadow border-white/70 bg-card/90">
-      <CardHeader>
-        <CardTitle>Tagesansicht</CardTitle>
-        <CardDescription>{format(currentDate, "dd.MM.yyyy")}</CardDescription>
+    <Card className="border-border/60 bg-white/82 shadow-sm">
+      <CardHeader className="space-y-1 pb-3">
+        <CardTitle className="text-base">Tagesansicht</CardTitle>
+        <CardDescription className="text-xs">{format(currentDate, "dd.MM.yyyy")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         {dayEvents.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Keine Termine an diesem Tag.</p>
+          <p className="text-xs text-muted-foreground">Keine Termine an diesem Tag.</p>
         ) : (
           dayEvents.map((event) => (
             <EventBlock compact={false} event={event} key={`${event.href}-${event.etag}`} timezone={timezone} />

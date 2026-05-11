@@ -26,13 +26,13 @@ const overviewCards = [
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Header
         eyebrow="Dashboard"
         title="Übersicht für deinen Handelsfachwirt"
         description="Die Uebersicht kombiniert lokale Metadaten mit echten Nextcloud-CalDAV-Terminen und haelt die naechsten Lern- und Pruefungspunkte im Blick."
         actions={
-          <Button asChild>
+          <Button asChild className="h-9 rounded-xl px-3 text-xs">
             <Link href="/events/new">+ Termin</Link>
           </Button>
         }
@@ -40,23 +40,23 @@ export default function DashboardPage() {
 
       <DashboardOverview timezone={DEFAULT_TIMEZONE} />
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-3 md:grid-cols-3">
         {overviewCards.map((card) => (
-          <Card key={card.title} className="card-shadow border-white/70 bg-card/90">
-            <CardHeader className="space-y-2">
+          <Card key={card.title} className="border-border/60 bg-white/85 shadow-sm">
+            <CardHeader className="space-y-1 pb-2">
               <CardDescription>{card.title}</CardDescription>
-              <CardTitle className="text-2xl">{card.value}</CardTitle>
+              <CardTitle className="text-lg">{card.value}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-6 text-muted-foreground">{card.description}</p>
+              <p className="text-xs leading-5 text-muted-foreground">{card.description}</p>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <Card className="card-shadow border-white/70 bg-card/90">
-          <CardHeader>
+      <section className="grid gap-3 lg:grid-cols-[1.25fr_0.75fr]">
+        <Card className="border-border/60 bg-white/85 shadow-sm">
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
                 <CardTitle>Nächste Ausbaustufen</CardTitle>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
               <Badge variant="secondary">Stabil zuerst</Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+          <CardContent className="space-y-2 text-xs leading-5 text-muted-foreground">
             <p>1. Build, Docker, Prisma und Auth sind bereits sauber stabilisiert.</p>
             <p>2. Kategorien, Vorlagen, Standorte und UI-Einstellungen sind bearbeitbar.</p>
             <p>3. CalDAV, ICS-Handling und echte Event-CRUDs sind jetzt verdrahtet.</p>
@@ -73,12 +73,12 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="card-shadow border-white/70 bg-card/90">
-          <CardHeader>
+        <Card className="border-border/60 bg-white/85 shadow-sm">
+          <CardHeader className="pb-3">
             <CardTitle>CalDAV-Hinweis</CardTitle>
             <CardDescription>Verbindungstest in den Einstellungen verfuegbar</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+          <CardContent className="space-y-2 text-xs leading-5 text-muted-foreground">
             <p>
               Die App speichert echte Termine bewusst nicht lokal. Änderungen laufen später direkt
               per CalDAV in deinen Nextcloud-Kalender.

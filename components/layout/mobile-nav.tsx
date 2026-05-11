@@ -13,13 +13,13 @@ export function MobileNav() {
     <>
       <Link
         href="/events/new"
-        className="fixed bottom-24 right-4 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:hidden"
+        className="fixed bottom-20 right-3 z-40 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 md:hidden"
       >
-        <Plus className="size-6" />
+        <Plus className="size-5" />
       </Link>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-white/60 bg-white/85 px-3 py-3 backdrop-blur md:hidden">
-        <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-white/60 bg-white/88 px-2.5 py-2 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-1.5">
           {mobileNavigation.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -30,11 +30,11 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-colors",
+                  "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[10px] font-semibold transition-colors",
                   isActive ? "bg-secondary text-foreground" : "text-muted-foreground",
                 )}
               >
-                <item.icon className="size-4" />
+                <item.icon className="size-3.5" />
                 <span className="truncate">{item.label}</span>
               </Link>
             );

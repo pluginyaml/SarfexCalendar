@@ -18,27 +18,27 @@ export function Header({
   return (
     <header
       className={cn(
-        "flex flex-col gap-4 rounded-[2rem] border border-white/60 bg-white/65 px-5 py-5 backdrop-blur sm:px-6",
-        "md:flex-row md:items-end md:justify-between",
+        "flex flex-col gap-3 rounded-[1.35rem] border border-white/60 bg-white/70 px-4 py-3 backdrop-blur",
+        "md:flex-row md:items-center md:justify-between",
         className,
       )}
     >
-      <div className="space-y-2">
+      <div className="space-y-1">
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+        <h1 className="max-w-4xl text-xl font-semibold tracking-tight text-balance sm:text-2xl">
           {title}
         </h1>
         {description ? (
-          <p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
+          <p className="max-w-3xl text-xs leading-5 text-muted-foreground sm:text-sm">
             {description}
           </p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-3">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>
   );
 }

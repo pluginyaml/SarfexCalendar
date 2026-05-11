@@ -84,7 +84,7 @@ export function CalendarManager({ timezone }: CalendarManagerProps) {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       <CalendarToolbar
         currentDate={currentDate}
         onNext={() => handleShift("next")}
@@ -95,13 +95,13 @@ export function CalendarManager({ timezone }: CalendarManagerProps) {
       />
 
       {error ? (
-        <div className="rounded-[1.75rem] border border-destructive/20 bg-destructive/5 px-5 py-10 text-sm text-destructive">
+        <div className="rounded-[1.25rem] border border-destructive/20 bg-destructive/5 px-4 py-6 text-xs text-destructive">
           {error}
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="rounded-[1.75rem] border border-white/70 bg-card/90 px-5 py-10 text-sm text-muted-foreground">
+        <div className="rounded-[1.25rem] border border-white/70 bg-card/90 px-4 py-6 text-xs text-muted-foreground">
           Kalenderdaten werden geladen...
         </div>
       ) : view === "day" ? (
