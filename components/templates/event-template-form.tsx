@@ -53,13 +53,15 @@ type EventTemplateFormProps = {
   }) => Promise<void>;
 };
 
+const NONE_OPTION = "__none__";
+
 function toFormValues(template: EventTemplateRecord | null, categories: CategoryRecord[]): EventTemplateFormValues {
   if (!template) {
     return {
       name: "",
       titleTemplate: "",
       categoryId: categories[0]?.id ?? "",
-      locationTemplateId: "",
+      locationTemplateId: NONE_OPTION,
       defaultDurationMinutes: 60,
       defaultDescription: "",
       defaultReminderInput: "60",
@@ -72,7 +74,7 @@ function toFormValues(template: EventTemplateRecord | null, categories: Category
     name: template.name,
     titleTemplate: template.titleTemplate,
     categoryId: template.categoryId,
-    locationTemplateId: template.locationTemplateId ?? "",
+    locationTemplateId: template.locationTemplateId ?? NONE_OPTION,
     defaultDurationMinutes: template.defaultDurationMinutes,
     defaultDescription: template.defaultDescription ?? "",
     defaultReminderInput: remindersToInputString(template.defaultReminderMinutes),
@@ -102,7 +104,7 @@ export function EventTemplateForm({
       name: values.name.trim(),
       titleTemplate: values.titleTemplate.trim(),
       categoryId: values.categoryId,
-      locationTemplateId: values.locationTemplateId || null,
+      locationTemplateId: values.locationTemplateId === NONE_OPTION ? null : values.locationTemplateId,
       defaultDurationMinutes: Number(values.defaultDurationMinutes),
       defaultDescription: values.defaultDescription.trim() || null,
       defaultReminderMinutes: parseReminderInput(values.defaultReminderInput),
@@ -167,7 +169,7 @@ export function EventTemplateForm({
                       <SelectValue placeholder="Optional" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Keine Standortvorlage</SelectItem>
+                      <SelectItem value={NONE_OPTION}>Keine Standortvorlage</SelectItem>
                       {locations.map((location) => (
                         <SelectItem key={location.id} value={location.id}>
                           {location.name}

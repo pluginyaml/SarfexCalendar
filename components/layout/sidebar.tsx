@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { appNavigation } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -56,9 +56,14 @@ export function Sidebar({ userEmail }: SidebarProps) {
           </div>
         </div>
 
-        <Button asChild className="mb-4 h-8 w-full justify-center rounded-[0.75rem] text-[11px]">
+        <Button
+          asChild
+          className="mb-4 h-8 w-full justify-center gap-1.5 rounded-[0.75rem] text-[11px] text-foreground"
+          variant="outline"
+        >
           <Link href="/events/new" onClick={() => setIsOpen(false)}>
-            + Termin
+            <Plus className="size-3.5 shrink-0" />
+            <span className="truncate">+ Termin</span>
           </Link>
         </Button>
 

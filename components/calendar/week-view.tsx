@@ -29,8 +29,8 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
     <section className="overflow-hidden rounded-[1rem] border border-black/6 bg-white">
       <div className="overflow-x-auto">
         <div className="min-w-[980px]">
-          <div className="grid grid-cols-[46px_repeat(7,minmax(0,1fr))] border-b border-black/6">
-            <div className="px-2 py-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="grid grid-cols-[64px_repeat(7,minmax(0,1fr))] border-b border-black/6">
+            <div className="px-3 py-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
               Woche
             </div>
             {days.map((day) => {
@@ -66,8 +66,9 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
             })}
           </div>
 
-          <div className="grid grid-cols-[46px_repeat(7,minmax(0,1fr))]">
-            <div className="border-r border-black/6">
+          <div className="max-h-[70vh] overflow-y-auto">
+            <div className="grid grid-cols-[64px_repeat(7,minmax(0,1fr))]">
+              <div className="relative border-r border-black/6">
               {hours.map((hour) => (
                 <div className="relative border-b border-black/[0.05]" key={hour} style={{ height: HOUR_ROW_HEIGHT }}>
                   <span className="absolute -top-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
@@ -75,43 +76,47 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
                   </span>
                 </div>
               ))}
-            </div>
+                <span className="absolute -bottom-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
+                  24:00
+                </span>
+              </div>
 
-            {days.map((day) => {
-              const dateKey = format(day, "yyyy-MM-dd");
-              const layouts = buildTimedEventLayoutsForDate(events, dateKey, timezone, startHour, endHour);
+              {days.map((day) => {
+                const dateKey = format(day, "yyyy-MM-dd");
+                const layouts = buildTimedEventLayoutsForDate(events, dateKey, timezone, startHour, endHour);
 
-              return (
-                <div className="border-r border-black/6 last:border-r-0" key={dateKey}>
-                  <div className="relative" style={{ height: totalHeight }}>
-                    {hours.map((hour) => (
-                      <div
-                        className="border-b border-black/[0.05]"
-                        key={`${dateKey}-${hour}`}
-                        style={{ height: HOUR_ROW_HEIGHT }}
-                      />
-                    ))}
-
-                    <div className="absolute inset-0">
-                      {layouts.map((layout) => (
+                return (
+                  <div className="border-r border-black/6 last:border-r-0" key={dateKey}>
+                    <div className="relative" style={{ height: totalHeight }}>
+                      {hours.map((hour) => (
                         <div
-                          className="absolute px-[3px] py-[2px]"
-                          key={`${layout.event.href}-${layout.event.etag}-${dateKey}`}
-                          style={{
-                            top: layout.top,
-                            left: `calc(${layout.leftPct}% + 1px)`,
-                            width: `calc(${layout.widthPct}% - 2px)`,
-                            height: layout.height,
-                          }}
-                        >
-                          <EventBlock event={layout.event} timezone={timezone} variant="timed" />
-                        </div>
+                          className="border-b border-black/[0.05]"
+                          key={`${dateKey}-${hour}`}
+                          style={{ height: HOUR_ROW_HEIGHT }}
+                        />
                       ))}
+
+                      <div className="absolute inset-0">
+                        {layouts.map((layout) => (
+                          <div
+                            className="absolute px-[3px] py-[2px]"
+                            key={`${layout.event.href}-${layout.event.etag}-${dateKey}`}
+                            style={{
+                              top: layout.top,
+                              left: `calc(${layout.leftPct}% + 1px)`,
+                              width: `calc(${layout.widthPct}% - 2px)`,
+                              height: layout.height,
+                            }}
+                          >
+                            <EventBlock event={layout.event} timezone={timezone} variant="timed" />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

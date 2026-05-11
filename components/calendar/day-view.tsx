@@ -61,47 +61,52 @@ export function DayView({ currentDate, events, timezone }: DayViewProps) {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-[46px_minmax(0,1fr)]">
-        <div className="border-r border-black/6">
-          {hours.map((hour) => (
-            <div className="relative border-b border-black/[0.05]" key={hour} style={{ height: HOUR_ROW_HEIGHT }}>
-              <span className="absolute -top-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
-                {`${hour}:00`}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="relative" style={{ height: totalHeight }}>
-          {hours.map((hour) => (
-            <div
-              className="border-b border-black/[0.05]"
-              key={`${dateKey}-${hour}`}
-              style={{ height: HOUR_ROW_HEIGHT }}
-            />
-          ))}
-
-          {layouts.length === 0 && allDayEvents.length === 0 ? (
-            <p className="absolute left-3 top-3 text-[11px] text-muted-foreground">
-              Keine Termine an diesem Tag.
-            </p>
-          ) : null}
-
-          <div className="absolute inset-0">
-            {layouts.map((layout) => (
-              <div
-                className="absolute px-[4px] py-[2px]"
-                key={`${layout.event.href}-${layout.event.etag}-${dateKey}`}
-                style={{
-                  top: layout.top,
-                  left: `calc(${layout.leftPct}% + 1px)`,
-                  width: `calc(${layout.widthPct}% - 2px)`,
-                  height: layout.height,
-                }}
-              >
-                <EventBlock event={layout.event} timezone={timezone} variant="timed" />
+      <div className="max-h-[72vh] overflow-y-auto">
+        <div className="grid grid-cols-[64px_minmax(0,1fr)]">
+          <div className="relative border-r border-black/6">
+            {hours.map((hour) => (
+              <div className="relative border-b border-black/[0.05]" key={hour} style={{ height: HOUR_ROW_HEIGHT }}>
+                <span className="absolute -top-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
+                  {`${hour}:00`}
+                </span>
               </div>
             ))}
+            <span className="absolute -bottom-1.5 right-2 bg-white px-1 text-[10px] text-muted-foreground">
+              24:00
+            </span>
+          </div>
+
+          <div className="relative" style={{ height: totalHeight }}>
+            {hours.map((hour) => (
+              <div
+                className="border-b border-black/[0.05]"
+                key={`${dateKey}-${hour}`}
+                style={{ height: HOUR_ROW_HEIGHT }}
+              />
+            ))}
+
+            {layouts.length === 0 && allDayEvents.length === 0 ? (
+              <p className="absolute left-3 top-3 text-[11px] text-muted-foreground">
+                Keine Termine an diesem Tag.
+              </p>
+            ) : null}
+
+            <div className="absolute inset-0">
+              {layouts.map((layout) => (
+                <div
+                  className="absolute px-[4px] py-[2px]"
+                  key={`${layout.event.href}-${layout.event.etag}-${dateKey}`}
+                  style={{
+                    top: layout.top,
+                    left: `calc(${layout.leftPct}% + 1px)`,
+                    width: `calc(${layout.widthPct}% - 2px)`,
+                    height: layout.height,
+                  }}
+                >
+                  <EventBlock event={layout.event} timezone={timezone} variant="timed" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

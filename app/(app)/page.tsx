@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,11 @@ export default function DashboardPage() {
         title="Kontrollzentrum"
         description="Ein ruhiger Ueberblick ueber die naechsten Termine, Sync-Status und deinen aktuellen Fokus."
         actions={
-          <Button asChild className="rounded-[0.7rem] px-2.5 text-[11px]" size="sm">
-            <Link href="/events/new">+ Termin</Link>
+          <Button asChild className="rounded-[0.7rem] px-2.5 text-[11px] text-foreground" size="sm" variant="outline">
+            <Link href="/events/new">
+              <Plus className="size-3.5 shrink-0" />
+              <span className="truncate">+ Termin</span>
+            </Link>
           </Button>
         }
       />

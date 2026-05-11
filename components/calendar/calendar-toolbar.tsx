@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { format, endOfWeek, startOfWeek } from "date-fns";
 import { de } from "date-fns/locale";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import type { DefaultView } from "@/types/entities";
 import { Button } from "@/components/ui/button";
 
@@ -99,8 +99,16 @@ export function CalendarToolbar({
             ))}
           </div>
 
-          <Button asChild className="rounded-[0.7rem] px-2.5 text-[11px]" size="sm">
-            <Link href="/events/new">+ Termin</Link>
+          <Button
+            asChild
+            className="shrink-0 rounded-[0.7rem] px-2.5 text-[11px] text-foreground"
+            size="sm"
+            variant="outline"
+          >
+            <Link href="/events/new">
+              <Plus className="size-3.5 shrink-0" />
+              <span className="truncate">+ Termin</span>
+            </Link>
           </Button>
         </div>
       </div>

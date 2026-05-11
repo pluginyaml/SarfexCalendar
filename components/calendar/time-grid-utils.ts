@@ -1,15 +1,12 @@
-import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import type { EventViewModel } from "@/lib/caldav";
 import { eventOccursOnDate } from "@/lib/event-time";
 
 export const HOUR_ROW_HEIGHT = 42;
 
-const DEFAULT_VISIBLE_START_HOUR = 8;
-const DEFAULT_VISIBLE_END_HOUR = 20;
-const MIN_VISIBLE_START_HOUR = 5;
-const MAX_VISIBLE_END_HOUR = 24;
-const MIN_EVENT_HEIGHT = 18;
+const DEFAULT_VISIBLE_START_HOUR = 0;
+const DEFAULT_VISIBLE_END_HOUR = 24;
+const MIN_EVENT_HEIGHT = 28;
 
 type TimedEventSegment = {
   event: EventViewModel;
@@ -66,38 +63,18 @@ function finalizeCluster(cluster: TimedEventSegment[], visibleStartMinutes: numb
   }));
 }
 
-export function getVisibleHourRange(events: EventViewModel[], dates: Date[], timezone: string) {
-  const dateKeys = dates.map((date) => format(date, "yyyy-MM-dd"));
-  const relevantEvents = events.filter(
-    (event) =>
-      !event.allDay &&
-      dateKeys.some((dateKey) => eventOccursOnDate(event, dateKey, timezone)),
-  );
-
-  if (relevantEvents.length === 0) {
-    return {
-      startHour: DEFAULT_VISIBLE_START_HOUR,
-      endHour: DEFAULT_VISIBLE_END_HOUR,
-    };
-  }
-
-  let earliestMinutes = DEFAULT_VISIBLE_START_HOUR * 60;
-  let latestMinutes = DEFAULT_VISIBLE_END_HOUR * 60;
-
-  for (const event of relevantEvents) {
-    earliestMinutes = Math.min(earliestMinutes, getLocalMinutes(event.start, timezone));
-    latestMinutes = Math.max(latestMinutes, getLocalMinutes(event.end, timezone));
-  }
+export function getVisibleHourRange(
+  _events: EventViewModel[],
+  _dates: Date[],
+  _timezone: string,
+) {
+  void _events;
+  void _dates;
+  void _timezone;
 
   return {
-    startHour: Math.max(
-      MIN_VISIBLE_START_HOUR,
-      Math.min(DEFAULT_VISIBLE_START_HOUR, Math.floor(earliestMinutes / 60) - 1),
-    ),
-    endHour: Math.min(
-      MAX_VISIBLE_END_HOUR,
-      Math.max(DEFAULT_VISIBLE_END_HOUR, Math.ceil(latestMinutes / 60) + 1),
-    ),
+    startHour: DEFAULT_VISIBLE_START_HOUR,
+    endHour: DEFAULT_VISIBLE_END_HOUR,
   };
 }
 

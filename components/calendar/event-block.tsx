@@ -13,6 +13,13 @@ type EventBlockProps = {
   variant?: "default" | "pill" | "timed";
 };
 
+const twoLineClampStyle = {
+  WebkitBoxOrient: "vertical" as const,
+  WebkitLineClamp: 2,
+  display: "-webkit-box",
+  overflow: "hidden",
+};
+
 function getCompactTimeLabel(event: EventViewModel, timezone: string) {
   if (event.allDay) {
     return "Ganztag";
@@ -36,18 +43,30 @@ export function EventBlock({
     return (
       <EventPopover event={event} timezone={timezone}>
         <button
-          className="flex h-5 w-full items-center gap-1 overflow-hidden rounded-[0.4rem] border bg-white/90 px-1.5 text-left transition-colors hover:bg-white"
+          className="flex min-h-[1.85rem] w-full items-start gap-1.5 overflow-hidden rounded-[0.4rem] border bg-white/90 px-1.5 py-1 text-left transition-colors hover:bg-white"
           style={{
             ...sharedStyle,
             backgroundColor: `${accentColor}12`,
           }}
+          title={event.title}
           type="button"
         >
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accentColor }} />
-          <span className="shrink-0 text-[9px] font-medium text-slate-500">
-            {getCompactTimeLabel(event, timezone)}
-          </span>
-          <span className="truncate text-[10px] font-medium text-slate-900">{event.title}</span>
+          <span
+            aria-hidden="true"
+            className="mt-[0.28rem] h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: accentColor }}
+          />
+          <div className="min-w-0">
+            <span className="block text-[9px] font-medium leading-none text-slate-500">
+              {getCompactTimeLabel(event, timezone)}
+            </span>
+            <span
+              className="mt-0.5 block text-[10px] font-medium leading-[1.05] text-slate-900"
+              style={twoLineClampStyle}
+            >
+              {event.title}
+            </span>
+          </div>
         </button>
       </EventPopover>
     );
@@ -63,12 +82,16 @@ export function EventBlock({
             backgroundColor: `${accentColor}14`,
             boxShadow: "inset 2px 0 0 0 " + accentColor,
           }}
+          title={event.title}
           type="button"
         >
-          <span className="truncate text-[10px] font-semibold leading-tight text-slate-900">
+          <span
+            className="text-[10px] font-semibold leading-[1.1] text-slate-900"
+            style={twoLineClampStyle}
+          >
             {event.title}
           </span>
-          <span className="truncate text-[9px] font-medium text-slate-500">
+          <span className="mt-1 text-[9px] font-medium text-slate-500">
             {formatEventTimeLabel(event, timezone)}
           </span>
         </button>
@@ -84,6 +107,7 @@ export function EventBlock({
           compact ? "gap-1" : "gap-1.5",
         )}
         style={sharedStyle}
+        title={event.title}
         type="button"
       >
         <span className="flex items-center gap-1.5">
@@ -102,7 +126,10 @@ export function EventBlock({
             {event.category || "Termin"}
           </span>
         </span>
-        <span className={cn("font-semibold leading-tight text-slate-900", compact ? "text-[11px]" : "text-xs")}>
+        <span
+          className={cn("font-semibold leading-tight text-slate-900", compact ? "text-[11px]" : "text-xs")}
+          style={twoLineClampStyle}
+        >
           {event.title}
         </span>
         <span className={cn("text-slate-500", compact ? "text-[10px]" : "text-[11px]")}>
