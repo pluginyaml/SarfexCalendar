@@ -28,6 +28,17 @@ export function LoginForm() {
     startTransition(async () => {
       setServerError(null);
 
+      if (process.env.NODE_ENV !== "production") {
+        console.info("[auth-debug] login form submit", {
+          normalizedInputEmail: values.email.trim().toLowerCase(),
+          emailLength: values.email.length,
+          passwordLength: values.password.length,
+          passwordLeadingWhitespace: /^\s/.test(values.password),
+          passwordTrailingWhitespace: /\s$/.test(values.password),
+          requestContentType: "application/json",
+        });
+      }
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { type NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { describeAuthString, logAuthDebug } from "@/lib/server/auth/debug";
 import { readRuntimeEnv, requireRuntimeEnv } from "@/lib/server/env/runtime";
 import { AppError } from "@/lib/server/errors";
 
@@ -106,6 +107,9 @@ export async function requirePageSession() {
   const session = await getSessionFromCookies();
 
   if (!session) {
+    logAuthDebug("requirePageSession.redirect", {
+      reason: "missing-or-invalid-session",
+    });
     redirect("/login");
   }
 
@@ -116,6 +120,11 @@ export function requireApiSession(request: NextRequest) {
   const session = getSessionFromRequest(request);
 
   if (!session) {
+    logAuthDebug("requireApiSession.unauthorized", {
+      pathname: request.nextUrl.pathname,
+      hasCookie: Boolean(request.cookies.get(SESSION_COOKIE_NAME)?.value),
+      cookie: describeAuthString(request.cookies.get(SESSION_COOKIE_NAME)?.value),
+    });
     throw new AppError("Nicht eingeloggt.", {
       code: "UNAUTHORIZED",
       statusCode: 401,
@@ -126,11 +135,22 @@ export function requireApiSession(request: NextRequest) {
 }
 
 export function attachSessionCookie(response: NextResponse, email: string) {
-  response.cookies.set({
+  const cookieOptions = {
     name: SESSION_COOKIE_NAME,
     value: createSessionToken(email),
     ...getSessionCookieOptions(),
+  };
+
+  logAuthDebug("attachSessionCookie", {
+    email,
+    cookieName: cookieOptions.name,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite,
+    maxAge: cookieOptions.maxAge,
+    cookieValue: describeAuthString(cookieOptions.value),
   });
+
+  response.cookies.set(cookieOptions);
 
   return response;
 }
