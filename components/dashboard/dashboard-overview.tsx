@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatInTimeZone } from "date-fns-tz";
 import { useEffect, useMemo, useState } from "react";
 import type { EventViewModel } from "@/lib/caldav";
 import { eventOccursOnDate, getUpcomingDaysRange } from "@/lib/event-time";
@@ -11,6 +12,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 type DashboardOverviewProps = {
   timezone: string;
 };
+
+function formatDashboardEventDate(event: EventViewModel | null, timezone: string) {
+  if (!event) {
+    return null;
+  }
+
+  if (event.allDay) {
+    return event.start;
+  }
+
+  return formatInTimeZone(event.start, timezone, "dd.MM.yyyy HH:mm");
+}
 
 export function DashboardOverview({ timezone }: DashboardOverviewProps) {
   const [events, setEvents] = useState<EventViewModel[]>([]);
@@ -59,44 +72,49 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
   const nextOnline = events.find((event) => event.category === "Onlineeinheit") ?? null;
 
   return (
-    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
+    <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <Card className="border-border/60 bg-white/85 shadow-sm">
+        <CardHeader className="space-y-1">
           <CardDescription>Heute</CardDescription>
-          <CardTitle>{isLoading ? "..." : `${todayEvents.length} Termine`}</CardTitle>
+          <CardTitle>{isLoading ? "Laden..." : `${todayEvents.length} Termine`}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-muted-foreground">
           {todayEvents[0]?.title ?? "Heute ist noch nichts geplant."}
         </CardContent>
       </Card>
 
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
+      <Card className="border-border/60 bg-white/85 shadow-sm">
+        <CardHeader className="space-y-1">
           <CardDescription>Naechste 14 Tage</CardDescription>
-          <CardTitle>{isLoading ? "..." : `${events.length} Termine`}</CardTitle>
+          <CardTitle>{isLoading ? "Laden..." : `${events.length} Termine`}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-muted-foreground">
-          Fokus auf die direkt bevorstehenden Einheiten, Deadlines und Praesenztermine.
+          Ein kompakter Blick auf die direkt bevorstehenden Einheiten, Deadlines und Praesenztermine.
         </CardContent>
       </Card>
 
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
+      <Card className="border-border/60 bg-white/85 shadow-sm">
+        <CardHeader className="space-y-1">
           <CardDescription>Naechste Pruefung</CardDescription>
           <CardTitle>{nextExam?.title ?? "Noch keine Pruefung gefunden"}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-muted-foreground">
-          {nextExam?.start ?? "Sobald CalDAV Daten liefert, wird hier die naechste Pruefung hervorgehoben."}
+          {formatDashboardEventDate(nextExam, timezone) ??
+            "Sobald CalDAV Daten liefert, wird hier die naechste Pruefung hervorgehoben."}
         </CardContent>
       </Card>
 
-      <Card className="card-shadow border-white/70 bg-card/90">
-        <CardHeader>
+      <Card className="border-border/60 bg-white/85 shadow-sm">
+        <CardHeader className="space-y-1">
           <CardDescription>Naechste Onlineeinheit</CardDescription>
           <CardTitle>{nextOnline?.title ?? "Noch keine Onlineeinheit gefunden"}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-between gap-3 text-sm leading-6 text-muted-foreground">
-          <span>{error ? `CalDAV-Hinweis: ${error}` : "Schneller Zugriff auf den Kalender."}</span>
+          <span>
+            {error
+              ? `CalDAV-Hinweis: ${error}`
+              : formatDashboardEventDate(nextOnline, timezone) ?? "Schneller Zugriff auf den Kalender."}
+          </span>
           <Button asChild size="sm">
             <Link href="/events/new">+ Termin</Link>
           </Button>

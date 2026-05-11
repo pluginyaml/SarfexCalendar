@@ -18,18 +18,21 @@ export function WeekView({ currentDate, events, timezone }: WeekViewProps) {
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   return (
-    <div className="overflow-x-auto">
-      <div className="grid min-w-[980px] gap-4 md:grid-cols-7">
+    <div className="overflow-x-auto rounded-[1.75rem] border border-white/70 bg-card/75 p-3">
+      <div className="grid min-w-[840px] gap-3 md:grid-cols-7">
         {days.map((day) => {
           const dateKey = format(day, "yyyy-MM-dd");
           const dayEvents = events.filter((event) => eventOccursOnDate(event, dateKey, timezone));
 
           return (
-            <Card className="card-shadow border-white/70 bg-card/90" key={dateKey}>
-              <CardHeader>
-                <CardTitle className="text-base">{format(day, "EEE dd.MM")}</CardTitle>
+            <Card className="border-border/60 bg-white/85 shadow-sm" key={dateKey}>
+              <CardHeader className="space-y-1 border-b border-border/50 pb-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                  {format(day, "EEE")}
+                </p>
+                <CardTitle className="text-base">{format(day, "dd.MM")}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-1.5 pt-4">
                 {dayEvents.length === 0 ? (
                   <p className="text-xs text-muted-foreground">Keine Termine</p>
                 ) : (

@@ -12,20 +12,38 @@ type EventBlockProps = {
 };
 
 export function EventBlock({ event, timezone, compact }: EventBlockProps) {
+  const accentColor = event.color ?? "#275DF1";
+
   return (
     <EventPopover event={event} timezone={timezone}>
       <button
         className={cn(
-          "flex w-full flex-col rounded-2xl px-3 py-2 text-left text-white shadow-lg transition-transform hover:-translate-y-0.5",
-          compact ? "gap-1" : "gap-2",
+          "flex w-full flex-col rounded-[1.15rem] border bg-white/90 px-3 py-2.5 text-left shadow-sm transition-colors hover:bg-white",
+          compact ? "gap-1.5" : "gap-2",
         )}
-        style={{ backgroundColor: event.color ?? "#275DF1" }}
+        style={{ borderColor: `${accentColor}30` }}
         type="button"
       >
-        <span className={cn("font-semibold leading-tight", compact ? "text-xs" : "text-sm")}>
+        <span className="flex items-center gap-2">
+          <span
+            aria-hidden="true"
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: accentColor }}
+          />
+          <span
+            className={cn(
+              "truncate uppercase tracking-[0.16em]",
+              compact ? "text-[10px] font-semibold" : "text-[11px] font-semibold",
+            )}
+            style={{ color: accentColor }}
+          >
+            {event.category || "Termin"}
+          </span>
+        </span>
+        <span className={cn("font-semibold leading-tight text-slate-900", compact ? "text-xs" : "text-sm")}>
           {event.title}
         </span>
-        <span className={cn("opacity-90", compact ? "text-[11px]" : "text-xs")}>
+        <span className={cn("text-slate-500", compact ? "text-[11px]" : "text-xs")}>
           {formatEventTimeLabel(event, timezone)}
         </span>
       </button>

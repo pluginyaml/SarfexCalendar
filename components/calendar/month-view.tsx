@@ -25,34 +25,45 @@ export function MonthView({ currentDate, events, timezone }: MonthViewProps) {
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   return (
-    <div className="grid gap-4 md:grid-cols-7">
+    <div className="grid gap-3 md:grid-cols-7">
       {days.map((day) => {
         const dateKey = format(day, "yyyy-MM-dd");
         const dayEvents = events.filter((event) => eventOccursOnDate(event, dateKey, timezone));
 
         return (
           <div
-            className="card-shadow min-h-44 rounded-[1.5rem] border border-white/70 bg-card/90 p-3"
+            className="min-h-40 rounded-[1.35rem] border border-border/60 bg-white/80 p-3 shadow-sm backdrop-blur"
             key={dateKey}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="space-y-0.5">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {format(day, "EEE")}
+                </p>
+                <span
+                  className={`text-sm font-semibold ${
+                    isSameMonth(day, currentDate) ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  {format(day, "dd.MM")}
+                </span>
+              </div>
               <span
-                className={`text-sm font-semibold ${
+                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
                   isSameMonth(day, currentDate) ? "text-foreground" : "text-muted-foreground"
-                }`}
+                } bg-muted/70`}
               >
-                {format(day, "dd.MM")}
-              </span>
-              <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
                 {dayEvents.length}
               </span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {dayEvents.slice(0, 3).map((event) => (
                 <EventBlock compact event={event} key={`${event.href}-${event.etag}-${dateKey}`} timezone={timezone} />
               ))}
               {dayEvents.length > 3 ? (
-                <p className="text-xs text-muted-foreground">+ {dayEvents.length - 3} weitere</p>
+                <p className="px-1 text-[11px] text-muted-foreground">
+                  + {dayEvents.length - 3} weitere
+                </p>
               ) : null}
             </div>
           </div>
