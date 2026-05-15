@@ -1,8 +1,9 @@
-import { formatInTimeZone } from "date-fns-tz";
-import type { EventViewModel } from "@/lib/caldav";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import type { EventViewModel } from "@/lib/calendar/types";
 import { eventOccursOnDate } from "@/lib/event-time";
 
 export const HOUR_ROW_HEIGHT = 42;
+export const TIME_GRID_STEP_MINUTES = 15;
 
 const DEFAULT_VISIBLE_START_HOUR = 0;
 const DEFAULT_VISIBLE_END_HOUR = 24;
@@ -25,6 +26,14 @@ export type TimedEventLayout = {
   widthPct: number;
 };
 
+type CalendarSlotInput = {
+  dateKey: string;
+  offsetY: number;
+  startHour: number;
+  endHour: number;
+  durationMinutes: number;
+};
+
 function getLocalMinutes(value: string, timezone: string) {
   const hour = Number(formatInTimeZone(value, timezone, "H"));
   const minutes = Number(formatInTimeZone(value, timezone, "m"));
@@ -34,6 +43,67 @@ function getLocalMinutes(value: string, timezone: string) {
 
 function getLocalDateKey(value: string, timezone: string) {
   return formatInTimeZone(value, timezone, "yyyy-MM-dd");
+}
+
+function padTimePart(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function minutesToTimeLabel(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return `${padTimePart(hours)}:${padTimePart(minutes)}`;
+}
+
+export function canDragTimedCalendarEvent(event: EventViewModel, timezone: string) {
+  if (!event.canDrag || event.allDay || event.isRecurring || event.isRecurringInstance) {
+    return false;
+  }
+
+  return getLocalDateKey(event.start, timezone) === getLocalDateKey(event.end, timezone);
+}
+
+export function resolveCalendarSlotFromOffset({
+  dateKey,
+  offsetY,
+  startHour,
+  endHour,
+  durationMinutes,
+}: CalendarSlotInput) {
+  const gridMinutes = (offsetY / HOUR_ROW_HEIGHT) * 60 + startHour * 60;
+  const snappedMinutes =
+    Math.round(gridMinutes / TIME_GRID_STEP_MINUTES) * TIME_GRID_STEP_MINUTES;
+  const minimumMinutes = startHour * 60;
+  const maximumMinutes = Math.max(
+    minimumMinutes,
+    endHour * 60 - Math.max(durationMinutes, TIME_GRID_STEP_MINUTES),
+  );
+  const clampedMinutes = Math.min(Math.max(snappedMinutes, minimumMinutes), maximumMinutes);
+
+  return {
+    dateKey,
+    startMinutes: clampedMinutes,
+    startTime: minutesToTimeLabel(clampedMinutes),
+  };
+}
+
+export function buildTimedEventDropUpdate(
+  event: EventViewModel,
+  slot: {
+    dateKey: string;
+    startTime: string;
+  },
+  timezone: string,
+) {
+  const eventDurationMs = new Date(event.end).getTime() - new Date(event.start).getTime();
+  const nextStartDate = fromZonedTime(`${slot.dateKey}T${slot.startTime}:00`, timezone);
+  const nextEndDate = new Date(nextStartDate.getTime() + eventDurationMs);
+
+  return {
+    start: nextStartDate.toISOString(),
+    end: nextEndDate.toISOString(),
+  };
 }
 
 function finalizeCluster(cluster: TimedEventSegment[], visibleStartMinutes: number) {

@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+  recurrenceEndModes,
+  recurrenceFrequencies,
+  recurrencePresets,
+  recurrenceWeekdays,
+} from "@/lib/recurrence/types";
 
 function isValidDateString(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -17,12 +23,13 @@ export const eventRangeQuerySchema = z
   .object({
     start: z.string().min(1, "start fehlt."),
     end: z.string().min(1, "end fehlt."),
+    calendarIds: z.string().trim().optional(),
   })
   .superRefine((value, context) => {
     if (!isValidDateTimeString(value.start) || !isValidDateTimeString(value.end)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Der Zeitraum ist ungueltig.",
+        message: "Der Zeitraum ist ungültig.",
       });
       return;
     }
@@ -39,8 +46,55 @@ export const eventDetailQuerySchema = z.object({
   href: z.string().min(1, "href fehlt."),
 });
 
+const recurrenceSchema = z
+  .object({
+    preset: z.enum(recurrencePresets),
+    frequency: z.enum(recurrenceFrequencies).optional(),
+    interval: z.number().int().positive().optional(),
+    byWeekdays: z.array(z.enum(recurrenceWeekdays)).optional(),
+    endMode: z.enum(recurrenceEndModes).optional(),
+    count: z.number().int().positive().optional(),
+    until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.preset === "none") {
+      return;
+    }
+
+    const endMode = value.endMode ?? "never";
+
+    if (value.preset === "custom" && !value.frequency) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Bei benutzerdefinierter Wiederholung fehlt die Frequenz.",
+      });
+    }
+
+    if ((value.frequency === "WEEKLY" || value.preset === "weekly" || value.preset === "biweekly") && value.byWeekdays?.length === 0) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Wöchentliche Wiederholungen brauchen mindestens einen Wochentag.",
+      });
+    }
+
+    if (endMode === "count" && !value.count) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Bitte gib eine Anzahl für das Wiederholungsende an.",
+      });
+    }
+
+    if (endMode === "until" && !value.until) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Bitte gib ein Enddatum für die Wiederholung an.",
+      });
+    }
+  });
+
 const baseEventPayloadSchema = z
   .object({
+    calendarId: z.string().trim().min(1, "Der Zielkalender fehlt.").optional(),
     title: z.string().trim().min(1, "Der Titel ist erforderlich."),
     description: z.string().trim().nullable().optional(),
     location: z.string().trim().nullable().optional(),
@@ -49,13 +103,14 @@ const baseEventPayloadSchema = z
     allDay: z.boolean(),
     category: z.string().trim().min(1, "Die Kategorie ist erforderlich."),
     reminders: z.array(z.coerce.number().int().positive()).default([]),
+    recurrence: recurrenceSchema.nullish(),
   })
   .superRefine((value, context) => {
     if (value.allDay) {
       if (!isValidDateString(value.start) || !isValidDateString(value.end)) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Ganztagstermine muessen als Datum uebergeben werden.",
+          message: "Ganztagstermine müssen als Datum übergeben werden.",
         });
         return;
       }
@@ -63,7 +118,7 @@ const baseEventPayloadSchema = z
       if (createDate(value.end).getTime() < createDate(value.start).getTime()) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Das Enddatum muss am selben Tag oder spaeter liegen.",
+          message: "Das Enddatum muss am selben Tag oder später liegen.",
         });
       }
 
@@ -73,7 +128,7 @@ const baseEventPayloadSchema = z
     if (!isValidDateTimeString(value.start) || !isValidDateTimeString(value.end)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Start- oder Endzeit ist ungueltig.",
+        message: "Start- oder Endzeit ist ungültig.",
       });
       return;
     }

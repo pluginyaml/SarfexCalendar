@@ -13,7 +13,7 @@ const emptyStringToNull = (value: unknown) => {
 export const eventTemplatePayloadSchema = z.object({
   name: z.string().trim().min(1, "Der Vorlagenname ist erforderlich."),
   titleTemplate: z.string().trim().min(1, "Die Titelvorlage ist erforderlich."),
-  categoryId: z.string().trim().min(1, "Bitte waehle eine Kategorie."),
+  categoryId: z.string().trim().min(1, "Bitte wähle eine Kategorie."),
   locationTemplateId: z.preprocess(emptyStringToNull, z.string().trim().min(1).nullable()),
   defaultDurationMinutes: z.coerce
     .number()

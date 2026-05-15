@@ -10,6 +10,7 @@ import type {
 } from "@/types/entities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -55,7 +56,10 @@ type EventTemplateFormProps = {
 
 const NONE_OPTION = "__none__";
 
-function toFormValues(template: EventTemplateRecord | null, categories: CategoryRecord[]): EventTemplateFormValues {
+function toFormValues(
+  template: EventTemplateRecord | null,
+  categories: CategoryRecord[],
+): EventTemplateFormValues {
   if (!template) {
     return {
       name: "",
@@ -104,7 +108,8 @@ export function EventTemplateForm({
       name: values.name.trim(),
       titleTemplate: values.titleTemplate.trim(),
       categoryId: values.categoryId,
-      locationTemplateId: values.locationTemplateId === NONE_OPTION ? null : values.locationTemplateId,
+      locationTemplateId:
+        values.locationTemplateId === NONE_OPTION ? null : values.locationTemplateId,
       defaultDurationMinutes: Number(values.defaultDurationMinutes),
       defaultDescription: values.defaultDescription.trim() || null,
       defaultReminderMinutes: parseReminderInput(values.defaultReminderInput),
@@ -116,10 +121,14 @@ export function EventTemplateForm({
   return (
     <Card className="card-shadow border-white/70 bg-card/90">
       <CardHeader>
-        <CardTitle>{template ? "Vorlage bearbeiten" : "Neue Vorlage"}</CardTitle>
-        <CardDescription>
-          Titel-Platzhalter: {"{thema}"}, {"{fach}"}, {"{modul}"}.
-        </CardDescription>
+        <div className="flex items-center gap-1">
+          <CardTitle>{template ? "Vorlage bearbeiten" : "Neue Vorlage"}</CardTitle>
+          <InfoPopover
+            description='Terminvorlagen übernehmen Titel, Kategorie, Dauer, Erinnerungen und optional eine Standortvorlage in neue Termine. Platzhalter wie {thema}, {fach} oder {modul} bleiben im Titel erhalten.'
+            title="Terminvorlagen"
+          />
+        </div>
+        <CardDescription>Titel-Platzhalter: {"{thema}"}, {"{fach}"}, {"{modul}"}.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -127,6 +136,7 @@ export function EventTemplateForm({
             <Label htmlFor="template-name">Name</Label>
             <Input id="template-name" required {...form.register("name")} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="template-title-template">Titelvorlage</Label>
             <Input
@@ -136,6 +146,7 @@ export function EventTemplateForm({
               {...form.register("titleTemplate")}
             />
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Kategorie</Label>
@@ -158,8 +169,15 @@ export function EventTemplateForm({
                 )}
               />
             </div>
+
             <div className="space-y-2">
-              <Label>Standortvorlage</Label>
+              <div className="flex items-center gap-1">
+                <Label>Standortvorlage</Label>
+                <InfoPopover
+                  description="Wenn du eine Standortvorlage verknüpfst, werden deren Adresse, Link und Standardbeschreibung später in neue Termine übernommen."
+                  title="Standortübernahme"
+                />
+              </div>
               <Controller
                 control={form.control}
                 name="locationTemplateId"
@@ -181,6 +199,7 @@ export function EventTemplateForm({
               />
             </div>
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="template-duration">Standarddauer in Minuten</Label>
@@ -192,6 +211,7 @@ export function EventTemplateForm({
                 {...form.register("defaultDurationMinutes", { valueAsNumber: true })}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="template-reminders">Erinnerungen in Minuten</Label>
               <Input
@@ -201,15 +221,22 @@ export function EventTemplateForm({
               />
             </div>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="template-description">Standardbeschreibung</Label>
             <Textarea id="template-description" {...form.register("defaultDescription")} />
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between rounded-2xl border border-border bg-white/70 px-4 py-3">
               <div>
-                <p className="font-medium">Ganztag standardmäßig</p>
-                <p className="text-sm text-muted-foreground">Für Deadlines oder reine Tagesmarker.</p>
+                <div className="flex items-center gap-1">
+                  <p className="font-medium">Ganztag standardmäßig</p>
+                  <InfoPopover
+                    description="Aktiviere das für Deadlines oder reine Tagesmarker ohne konkrete Uhrzeit."
+                    title="Ganztag"
+                  />
+                </div>
               </div>
               <Controller
                 control={form.control}
@@ -219,10 +246,13 @@ export function EventTemplateForm({
                 )}
               />
             </div>
+
             <div className="flex items-center justify-between rounded-2xl border border-border bg-white/70 px-4 py-3">
               <div>
                 <p className="font-medium">Aktiv</p>
-                <p className="text-sm text-muted-foreground">Nur aktive Vorlagen sollen später prominent erscheinen.</p>
+                <p className="text-sm text-muted-foreground">
+                  Nur aktive Vorlagen stehen in Formularen direkt bereit.
+                </p>
               </div>
               <Controller
                 control={form.control}
@@ -241,7 +271,7 @@ export function EventTemplateForm({
               </Button>
             ) : (
               <span className="text-sm text-muted-foreground">
-                Vorlagen füllen später Terminformulare automatisch vor.
+                Vorlagen füllen neue Termine automatisch vor.
               </span>
             )}
             <Button disabled={isSaving} type="submit">

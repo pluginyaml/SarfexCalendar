@@ -12,7 +12,7 @@ const emptyStringToNull = (value: unknown) => {
 export const locationTemplatePayloadSchema = z.object({
   name: z.string().trim().min(1, "Der Name ist erforderlich."),
   address: z.string().trim().min(1, "Die Adresse ist erforderlich."),
-  link: z.preprocess(emptyStringToNull, z.string().url("Bitte gib eine gueltige URL ein.").nullable()),
+  link: z.preprocess(emptyStringToNull, z.string().url("Bitte gib eine gültige URL ein.").nullable()),
   notes: z.preprocess(emptyStringToNull, z.string().max(2000).nullable()),
   defaultDescription: z.preprocess(emptyStringToNull, z.string().max(4000).nullable()),
   isActive: z.boolean(),

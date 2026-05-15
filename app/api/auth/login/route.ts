@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         normalizedInputEmail: input.email.trim().toLowerCase(),
       });
 
-      return jsonError("Ungueltige Anmeldedaten.", {
+      return jsonError("Ungültige Anmeldedaten.", {
         status: 401,
         code: "INVALID_CREDENTIALS",
       });

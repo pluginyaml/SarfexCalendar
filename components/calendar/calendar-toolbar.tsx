@@ -1,19 +1,32 @@
 "use client";
 
-import Link from "next/link";
 import { format, endOfWeek, startOfWeek } from "date-fns";
 import { de } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { DefaultView } from "@/types/entities";
+import { NewEventButton } from "@/components/layout/new-event-button";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type CalendarToolbarProps = {
   currentDate: Date;
   view: DefaultView;
+  calendars?: Array<{
+    id: string;
+    name: string;
+  }>;
+  selectedCalendarId?: string;
   onViewChange: (view: DefaultView) => void;
   onPrevious: () => void;
   onNext: () => void;
   onToday: () => void;
+  onCalendarChange?: (value: string) => void;
 };
 
 function getViewLabel(view: DefaultView) {
@@ -23,6 +36,10 @@ function getViewLabel(view: DefaultView) {
 
   if (view === "week") {
     return "Woche";
+  }
+
+  if (view === "year") {
+    return "Jahr";
   }
 
   return "Monat";
@@ -36,7 +53,11 @@ function getPeriodLabel(view: DefaultView, currentDate: Date) {
   if (view === "week") {
     const start = startOfWeek(currentDate, { weekStartsOn: 1 });
     const end = endOfWeek(currentDate, { weekStartsOn: 1 });
-    return `${format(start, "dd.MM.", { locale: de })} - ${format(end, "dd.MM.yyyy", { locale: de })}`;
+    return `${format(start, "dd.MM.", { locale: de })} – ${format(end, "dd.MM.yyyy", { locale: de })}`;
+  }
+
+  if (view === "year") {
+    return format(currentDate, "yyyy", { locale: de });
   }
 
   return format(currentDate, "LLLL yyyy", { locale: de });
@@ -45,10 +66,13 @@ function getPeriodLabel(view: DefaultView, currentDate: Date) {
 export function CalendarToolbar({
   currentDate,
   view,
+  calendars = [],
+  selectedCalendarId = "all",
   onViewChange,
   onPrevious,
   onNext,
   onToday,
+  onCalendarChange,
 }: CalendarToolbarProps) {
   return (
     <div className="flex flex-col gap-2 rounded-[1rem] border border-black/6 bg-white/90 px-3 py-2">
@@ -66,6 +90,22 @@ export function CalendarToolbar({
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
+          {calendars.length > 1 && onCalendarChange ? (
+            <Select onValueChange={onCalendarChange} value={selectedCalendarId}>
+              <SelectTrigger className="h-8 w-[210px] rounded-[0.7rem] text-[11px]">
+                <SelectValue placeholder="Alle aktiven Kalender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle aktiven Kalender</SelectItem>
+                {calendars.map((calendar) => (
+                  <SelectItem key={calendar.id} value={calendar.id}>
+                    {calendar.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : null}
+
           <div className="flex items-center gap-1">
             <Button className="rounded-[0.7rem]" onClick={onPrevious} size="icon" type="button" variant="outline">
               <ChevronLeft className="size-3.5" />
@@ -85,7 +125,7 @@ export function CalendarToolbar({
           </div>
 
           <div className="flex items-center rounded-[0.75rem] bg-black/[0.035] p-0.5">
-            {(["day", "week", "month"] as const).map((value) => (
+            {(["day", "week", "month", "year"] as const).map((value) => (
               <Button
                 className="h-7 rounded-[0.6rem] px-2.5 text-[11px]"
                 key={value}
@@ -94,22 +134,18 @@ export function CalendarToolbar({
                 type="button"
                 variant={view === value ? "default" : "ghost"}
               >
-                {value === "day" ? "Tag" : value === "week" ? "Woche" : "Monat"}
+                {value === "day"
+                  ? "Tag"
+                  : value === "week"
+                    ? "Woche"
+                    : value === "month"
+                      ? "Monat"
+                      : "Jahr"}
               </Button>
             ))}
           </div>
 
-          <Button
-            asChild
-            className="shrink-0 rounded-[0.7rem] px-2.5 text-[11px] text-foreground"
-            size="sm"
-            variant="outline"
-          >
-            <Link href="/events/new">
-              <Plus className="size-3.5 shrink-0" />
-              <span className="truncate">Termin</span>
-            </Link>
-          </Button>
+          <NewEventButton className="shrink-0" />
         </div>
       </div>
     </div>

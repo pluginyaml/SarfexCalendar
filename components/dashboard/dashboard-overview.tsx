@@ -2,13 +2,15 @@
 
 import { formatInTimeZone } from "date-fns-tz";
 import { useEffect, useMemo, useState } from "react";
-import type { EventViewModel } from "@/lib/caldav";
+import { requestEvents } from "@/lib/calendar/client";
+import type { EventViewModel, EventWarning } from "@/lib/calendar/types";
 import { eventOccursOnDate, getUpcomingEventsRange } from "@/lib/event-time";
-import { requestJson } from "@/lib/http-client";
 
 type DashboardOverviewProps = {
   timezone: string;
 };
+
+const STALE_WARNING_CODE = "CALDAV_CACHE_STALE";
 
 function normalizeCategory(value: string | null | undefined) {
   return (value ?? "")
@@ -39,6 +41,7 @@ function formatEventDetail(event: EventViewModel | null) {
 
 export function DashboardOverview({ timezone }: DashboardOverviewProps) {
   const [events, setEvents] = useState<EventViewModel[]>([]);
+  const [warnings, setWarnings] = useState<EventWarning[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +51,7 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
 
     void (async () => {
       try {
-        const result = await requestJson<EventViewModel[]>(
+        const result = await requestEvents(
           `/api/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`,
         );
 
@@ -57,16 +60,18 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
         }
 
         setEvents(
-          [...result].sort(
+          [...result.events].sort(
             (left, right) => new Date(left.start).getTime() - new Date(right.start).getTime(),
           ),
         );
+        setWarnings(result.warnings);
       } catch (loadError) {
         if (!isMounted) {
           return;
         }
 
         setError(loadError instanceof Error ? loadError.message : "Termine konnten nicht geladen werden.");
+        setWarnings([]);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -96,6 +101,8 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
     () => events.filter((event) => normalizeCategory(event.category) === "deadline").length,
     [events],
   );
+  const nonStaleWarnings = warnings.filter((warning) => warning.code !== STALE_WARNING_CODE);
+  const hasStaleWarnings = warnings.some((warning) => warning.code === STALE_WARNING_CODE);
 
   const items = [
     {
@@ -124,9 +131,12 @@ export function DashboardOverview({ timezone }: DashboardOverviewProps) {
     },
     {
       label: "CalDAV",
-      value: error ? "Störung" : isLoading ? "Prüfe..." : "Verbunden",
-      detail: error ?? "Nextcloud ist die einzige Quelle der Wahrheit",
-      accentClass: error ? "bg-rose-500/70" : "bg-emerald-500/70",
+      value: error ? "Störung" : isLoading ? "Prüfe..." : nonStaleWarnings.length > 0 ? "Warnung" : hasStaleWarnings ? "Cache" : "Verbunden",
+      detail:
+        error ??
+        nonStaleWarnings[0]?.message ??
+        (hasStaleWarnings ? "Kurzzeitig zwischengespeicherte Daten" : "Nextcloud ist die einzige Quelle der Wahrheit"),
+      accentClass: error || nonStaleWarnings.length > 0 ? "bg-rose-500/70" : "bg-emerald-500/70",
     },
   ];
 

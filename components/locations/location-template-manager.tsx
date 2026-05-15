@@ -111,7 +111,7 @@ export function LocationTemplateManager() {
       setSelectedLocationId(null);
       await loadLocations();
     } catch (deleteError) {
-      toast.error(deleteError instanceof Error ? deleteError.message : "Loeschen fehlgeschlagen.");
+      toast.error(deleteError instanceof Error ? deleteError.message : "Löschen fehlgeschlagen.");
     } finally {
       setIsSaving(false);
     }

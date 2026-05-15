@@ -11,8 +11,8 @@ export default function NewEventPage() {
     <div className="space-y-6">
       <Header
         eyebrow="Neuer Termin"
-        title="Terminformular vorbereiten"
-        description="Pflichtfelder, Ganztag-Handling, Vorlagen, Standorte und Erinnerungen werden direkt in einen echten CalDAV-Termin geschrieben."
+        title="Neuen Termin anlegen"
+        description="Direkt in Nextcloud speichern."
       />
       <EventEditor mode="create" timezone={DEFAULT_TIMEZONE} />
     </div>

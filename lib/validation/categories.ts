@@ -6,7 +6,7 @@ export const categoryPayloadSchema = z.object({
   color: z
     .string()
     .regex(/^#([0-9a-fA-F]{6})$/, "Die Farbe muss als HEX-Wert wie #2563EB vorliegen."),
-  icon: z.string().trim().min(1, "Bitte waehle ein Icon."),
+  icon: z.string().trim().min(1, "Bitte wähle ein Icon."),
   defaultDurationMinutes: z.coerce
     .number()
     .int()

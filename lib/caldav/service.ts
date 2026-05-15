@@ -1,15 +1,24 @@
 import { XMLParser } from "fast-xml-parser";
 import { randomUUID } from "node:crypto";
+import {
+  buildCalDavTimeRangeCacheKey,
+  invalidateCalDavTimeRangeCache,
+  readThroughMemoryCache,
+} from "@/lib/cache/caldav-read-cache";
+import {
+  normalizeCalendarCollectionUrl,
+  normalizeCalendarItemHref,
+  resolveDavUrl,
+} from "@/lib/calendar/source-utils";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 import { buildEventIcs, extractExistingEventMetadata, parseEventIcs } from "@/lib/caldav/ics";
-import type {
-  CalDavConnectionResult,
-  CalDavEventInput,
-  EventViewModel,
-} from "@/lib/caldav/types";
+import type { CalDavConnectionResult, CalDavEventInput } from "@/lib/caldav/types";
+import type { EventListResponse, EventViewModel, EventWarning } from "@/lib/calendar/types";
+import { expandRecurringEventInRange } from "@/lib/recurrence/expand";
 import { getCategoryColorMap } from "@/lib/server/db/categories";
 import { readRuntimeEnv, requireRuntimeEnv } from "@/lib/server/env/runtime";
-import { AppError } from "@/lib/server/errors";
+import { AppError, isAppError } from "@/lib/server/errors";
+import type { CalendarSourceRecord } from "@/types/entities";
 
 const xmlParser = new XMLParser({
   ignoreAttributes: false,
@@ -44,43 +53,51 @@ function buildAuthHeader() {
 function getCalDavConfig() {
   const env = requireRuntimeEnv(
     "CALDAV_BASE_URL",
-    "CALDAV_CALENDAR_URL",
     "CALDAV_USERNAME",
     "CALDAV_PASSWORD",
   );
 
   return {
     ...env,
+    CALDAV_CALENDAR_URL: readRuntimeEnv().CALDAV_CALENDAR_URL ?? null,
     TIMEZONE: readRuntimeEnv().TIMEZONE || DEFAULT_TIMEZONE,
   };
 }
 
-function resolveCalendarItemUrl(href: string) {
-  const { CALDAV_BASE_URL, CALDAV_CALENDAR_URL } = getCalDavConfig();
+function getFallbackCalendarUrl() {
+  const { CALDAV_CALENDAR_URL } = getCalDavConfig();
+
+  if (!CALDAV_CALENDAR_URL) {
+    throw new AppError("Es ist keine CalDAV-Kalender-URL konfiguriert.", {
+      code: "CALDAV_CALENDAR_NOT_CONFIGURED",
+      statusCode: 500,
+    });
+  }
+
+  return normalizeCalendarCollectionUrl(CALDAV_CALENDAR_URL);
+}
+
+function resolveCalendarItemUrl(href: string, calendarUrl?: string) {
+  const { CALDAV_BASE_URL } = getCalDavConfig();
 
   if (href.startsWith("http://") || href.startsWith("https://")) {
     return href;
   }
 
   if (href.startsWith("/")) {
-    return new URL(href, CALDAV_BASE_URL).toString();
+    return resolveDavUrl(href, CALDAV_BASE_URL);
   }
 
-  const calendarUrl = CALDAV_CALENDAR_URL.endsWith("/")
-    ? CALDAV_CALENDAR_URL
-    : `${CALDAV_CALENDAR_URL}/`;
-
-  return new URL(href, calendarUrl).toString();
+  return new URL(href, calendarUrl ?? getFallbackCalendarUrl()).toString();
 }
 
-function buildCalendarItemHref(uid: string) {
-  const { CALDAV_CALENDAR_URL } = getCalDavConfig();
-  const calendarUrl = new URL(CALDAV_CALENDAR_URL.endsWith("/") ? CALDAV_CALENDAR_URL : `${CALDAV_CALENDAR_URL}/`);
-  return new URL(`${uid}.ics`, calendarUrl).toString();
+function buildCalendarItemUrl(calendarUrl: string, uid: string) {
+  const normalizedCalendarUrl = normalizeCalendarCollectionUrl(calendarUrl);
+  return new URL(`${uid}.ics`, normalizedCalendarUrl).toString();
 }
 
 async function caldavRequest(url: string, init?: RequestInit) {
-  const response = await fetch(url, {
+  return fetch(url, {
     ...init,
     cache: "no-store",
     headers: {
@@ -88,35 +105,6 @@ async function caldavRequest(url: string, init?: RequestInit) {
       ...(init?.headers ?? {}),
     },
   });
-
-  return response;
-}
-
-async function parseCalendarQueryResponse(xml: string) {
-  const parsed = xmlParser.parse(xml);
-  const responses = asArray(parsed.multistatus?.response);
-
-  return responses
-    .map((response) => {
-      const propStat = asArray(response.propstat).find((item) =>
-        String(item.status ?? "").includes("200"),
-      );
-
-      const href = typeof response.href === "string" ? response.href : null;
-      const etag = propStat?.prop?.getetag;
-      const calendarData = propStat?.prop?.["calendar-data"];
-
-      if (!href || typeof etag !== "string" || typeof calendarData !== "string") {
-        return null;
-      }
-
-      return {
-        href,
-        etag,
-        calendarData,
-      } satisfies CalendarResponse;
-    })
-    .filter((value): value is CalendarResponse => value !== null);
 }
 
 function ensureSuccessfulResponse(response: Response, context: string) {
@@ -139,7 +127,7 @@ function ensureSuccessfulResponse(response: Response, context: string) {
   }
 
   if (response.status === 412) {
-    throw new AppError("Der Termin wurde auf einem anderen Geraet geaendert.", {
+    throw new AppError("Der Termin wurde auf einem anderen Gerät geändert.", {
       code: "CALDAV_ETAG_CONFLICT",
       statusCode: 409,
     });
@@ -175,10 +163,133 @@ function buildCalendarQueryBody(rangeStart: string, rangeEnd: string) {
 </c:calendar-query>`;
 }
 
-export async function testConnection(): Promise<CalDavConnectionResult> {
-  const { CALDAV_CALENDAR_URL } = getCalDavConfig();
+async function parseCalendarQueryResponse(xml: string) {
+  const parsed = xmlParser.parse(xml);
+  const responses = asArray(parsed.multistatus?.response);
 
-  const response = await caldavRequest(CALDAV_CALENDAR_URL, {
+  return responses
+    .map((response) => {
+      const propStat = asArray(response.propstat).find((item) =>
+        String(item.status ?? "").includes("200"),
+      );
+      const href = typeof response.href === "string" ? response.href : null;
+      const etag = propStat?.prop?.getetag;
+      const calendarData = propStat?.prop?.["calendar-data"];
+
+      if (!href || typeof etag !== "string" || typeof calendarData !== "string") {
+        return null;
+      }
+
+      return {
+        href,
+        etag,
+        calendarData,
+      } satisfies CalendarResponse;
+    })
+    .filter((value): value is CalendarResponse => value !== null);
+}
+
+function getCalendarParseOptions(calendarSource: CalendarSourceRecord) {
+  return {
+    id: calendarSource.id,
+    href: calendarSource.normalizedHref,
+    name: calendarSource.displayName,
+    color: calendarSource.color ?? calendarSource.remoteColor,
+  };
+}
+
+function sortEvents(events: EventViewModel[]) {
+  return [...events].sort((left, right) => {
+    const leftTime = left.allDay
+      ? new Date(`${left.start}T00:00:00Z`).getTime()
+      : new Date(left.start).getTime();
+    const rightTime = right.allDay
+      ? new Date(`${right.start}T00:00:00Z`).getTime()
+      : new Date(right.start).getTime();
+
+    return leftTime - rightTime;
+  });
+}
+
+function buildCalendarWarning(
+  calendarSource: CalendarSourceRecord,
+  code: string,
+  message: string,
+): EventWarning {
+  return {
+    code,
+    message,
+    calendarId: calendarSource.id,
+    calendarName: calendarSource.displayName,
+  };
+}
+
+function getCalendarLoadFailureWarning(
+  calendarSource: CalendarSourceRecord,
+  error: unknown,
+): EventWarning {
+  const message = error instanceof Error ? error.message : "Kalender konnte nicht geladen werden.";
+
+  return buildCalendarWarning(
+    calendarSource,
+    isAppError(error) ? error.code : "CALDAV_READ_FAILED",
+    `${calendarSource.displayName}: ${message}`,
+  );
+}
+
+function getCalendarStaleCacheWarning(calendarSource: CalendarSourceRecord): EventWarning {
+  return buildCalendarWarning(
+    calendarSource,
+    "CALDAV_CACHE_STALE",
+    `${calendarSource.displayName}: Es werden kurzzeitig zwischengespeicherte Termine angezeigt.`,
+  );
+}
+
+async function listEventsForCalendar(
+  rangeStart: string,
+  rangeEnd: string,
+  calendarSource: CalendarSourceRecord,
+  timezone: string,
+  categoryColors: Record<string, string>,
+) {
+  const response = await caldavRequest(calendarSource.url, {
+    method: "REPORT",
+    headers: {
+      Depth: "1",
+      "Content-Type": "application/xml; charset=utf-8",
+    },
+    body: buildCalendarQueryBody(rangeStart, rangeEnd),
+  });
+
+  ensureSuccessfulResponse(response, "CalDAV-Abfrage");
+
+  const xml = await response.text();
+  const calendarResponses = await parseCalendarQueryResponse(xml);
+
+  return calendarResponses.flatMap((item) => {
+    const event = parseEventIcs(item.calendarData, {
+      href: normalizeCalendarItemHref(item.href),
+      etag: item.etag,
+      timezone,
+      categoryColors,
+      calendar: getCalendarParseOptions(calendarSource),
+    });
+
+    if (!event.recurrenceRule) {
+      return [event];
+    }
+
+    return expandRecurringEventInRange(item.calendarData, event, {
+      rangeStart,
+      rangeEnd,
+      timezone,
+    });
+  });
+}
+
+export async function testConnection(calendarUrl?: string): Promise<CalDavConnectionResult> {
+  const targetCalendarUrl = calendarUrl ?? getFallbackCalendarUrl();
+  const response = await caldavRequest(targetCalendarUrl, {
     method: "PROPFIND",
     headers: {
       Depth: "0",
@@ -198,52 +309,73 @@ export async function testConnection(): Promise<CalDavConnectionResult> {
   return {
     ok: true,
     message: "Die Verbindung zum Nextcloud-Kalender funktioniert.",
-    calendarUrl: CALDAV_CALENDAR_URL,
+    calendarUrl: targetCalendarUrl,
   };
 }
 
-export async function listEvents(rangeStart: string, rangeEnd: string): Promise<EventViewModel[]> {
-  const { CALDAV_CALENDAR_URL, TIMEZONE } = getCalDavConfig();
+export async function listEvents(
+  rangeStart: string,
+  rangeEnd: string,
+  calendarSources: CalendarSourceRecord[],
+): Promise<EventListResponse> {
+  if (calendarSources.length === 0) {
+    return {
+      events: [],
+      warnings: [],
+    };
+  }
 
-  const response = await caldavRequest(CALDAV_CALENDAR_URL, {
-    method: "REPORT",
-    headers: {
-      Depth: "1",
-      "Content-Type": "application/xml; charset=utf-8",
-    },
-    body: buildCalendarQueryBody(rangeStart, rangeEnd),
-  });
-
-  ensureSuccessfulResponse(response, "CalDAV-Abfrage");
-
-  const xml = await response.text();
-  const calendarResponses = await parseCalendarQueryResponse(xml);
+  const { TIMEZONE } = getCalDavConfig();
   const categoryColors = await getCategoryColorMap();
-
-  return calendarResponses
-    .map((item) =>
-      parseEventIcs(item.calendarData, {
-        href: item.href,
-        etag: item.etag,
+  const calendarResults = await Promise.all(
+    calendarSources.map(async (calendarSource) => {
+      const cacheKey = buildCalDavTimeRangeCacheKey({
+        calendarHref: calendarSource.normalizedHref,
+        start: rangeStart,
+        end: rangeEnd,
         timezone: TIMEZONE,
-        categoryColors,
-      }),
-    )
-    .sort((left, right) => {
-      const leftTime = left.allDay
-        ? new Date(`${left.start}T00:00:00Z`).getTime()
-        : new Date(left.start).getTime();
-      const rightTime = right.allDay
-        ? new Date(`${right.start}T00:00:00Z`).getTime()
-        : new Date(right.start).getTime();
+      });
 
-      return leftTime - rightTime;
-    });
+      try {
+        const result = await readThroughMemoryCache(
+          cacheKey,
+          () =>
+            listEventsForCalendar(
+              rangeStart,
+              rangeEnd,
+              calendarSource,
+              TIMEZONE,
+              categoryColors,
+            ),
+        );
+
+        return {
+          events: result.value,
+          warnings:
+            result.cacheState === "stale" ? [getCalendarStaleCacheWarning(calendarSource)] : [],
+        };
+      } catch (error) {
+        return {
+          events: [],
+          warnings: [getCalendarLoadFailureWarning(calendarSource, error)],
+        };
+      }
+    }),
+  );
+
+  return {
+    events: sortEvents(calendarResults.flatMap((result) => result.events)),
+    warnings: calendarResults.flatMap((result) => result.warnings),
+  };
 }
 
-export async function getEventByHref(href: string): Promise<EventViewModel> {
+export async function getEventByHref(
+  href: string,
+  calendarSource?: CalendarSourceRecord | null,
+): Promise<EventViewModel> {
   const { TIMEZONE } = getCalDavConfig();
-  const response = await caldavRequest(resolveCalendarItemUrl(href), {
+  const resolvedCalendarSource = calendarSource ?? null;
+  const response = await caldavRequest(resolveCalendarItemUrl(href, resolvedCalendarSource?.url), {
     method: "GET",
     headers: {
       Accept: "text/calendar",
@@ -265,17 +397,21 @@ export async function getEventByHref(href: string): Promise<EventViewModel> {
   const categoryColors = await getCategoryColorMap();
 
   return parseEventIcs(calendarData, {
-    href,
+    href: normalizeCalendarItemHref(href),
     etag,
     timezone: TIMEZONE,
     categoryColors,
+    calendar: resolvedCalendarSource ? getCalendarParseOptions(resolvedCalendarSource) : null,
   });
 }
 
-export async function createEvent(input: CalDavEventInput): Promise<EventViewModel> {
+export async function createEvent(
+  calendarSource: CalendarSourceRecord,
+  input: CalDavEventInput,
+): Promise<EventViewModel> {
   const { TIMEZONE } = getCalDavConfig();
   const uid = randomUUID();
-  const targetUrl = buildCalendarItemHref(uid);
+  const targetUrl = buildCalendarItemUrl(calendarSource.url, uid);
   const ics = buildEventIcs(input, {
     uid,
     timezone: TIMEZONE,
@@ -291,18 +427,21 @@ export async function createEvent(input: CalDavEventInput): Promise<EventViewMod
   });
 
   ensureSuccessfulResponse(response, "Termin speichern");
+  invalidateCalDavTimeRangeCache(calendarSource.normalizedHref);
 
-  const href = new URL(targetUrl).pathname;
-  return getEventByHref(href);
+  return getEventByHref(normalizeCalendarItemHref(new URL(targetUrl).pathname), calendarSource);
 }
 
 export async function updateEvent(
   href: string,
   etag: string,
   input: CalDavEventInput,
+  calendarSource?: CalendarSourceRecord | null,
 ): Promise<EventViewModel> {
   const { TIMEZONE } = getCalDavConfig();
-  const existingResponse = await caldavRequest(resolveCalendarItemUrl(href), {
+  const resolvedCalendarSource = calendarSource ?? null;
+  const targetUrl = resolveCalendarItemUrl(href, resolvedCalendarSource?.url);
+  const existingResponse = await caldavRequest(targetUrl, {
     method: "GET",
     headers: {
       Accept: "text/calendar",
@@ -319,7 +458,7 @@ export async function updateEvent(
     timezone: TIMEZONE,
   });
 
-  const updateResponse = await caldavRequest(resolveCalendarItemUrl(href), {
+  const updateResponse = await caldavRequest(targetUrl, {
     method: "PUT",
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
@@ -329,17 +468,28 @@ export async function updateEvent(
   });
 
   ensureSuccessfulResponse(updateResponse, "Termin aktualisieren");
+  if (resolvedCalendarSource) {
+    invalidateCalDavTimeRangeCache(resolvedCalendarSource.normalizedHref);
+  }
 
-  return getEventByHref(href);
+  return getEventByHref(normalizeCalendarItemHref(href), resolvedCalendarSource);
 }
 
-export async function deleteEvent(href: string, etag: string) {
-  const response = await caldavRequest(resolveCalendarItemUrl(href), {
+export async function deleteEvent(
+  href: string,
+  etag: string,
+  calendarSource?: CalendarSourceRecord | null,
+) {
+  const targetUrl = resolveCalendarItemUrl(href, calendarSource?.url);
+  const response = await caldavRequest(targetUrl, {
     method: "DELETE",
     headers: {
       "If-Match": etag,
     },
   });
 
-  ensureSuccessfulResponse(response, "Termin loeschen");
+  ensureSuccessfulResponse(response, "Termin löschen");
+  if (calendarSource) {
+    invalidateCalDavTimeRangeCache(calendarSource.normalizedHref);
+  }
 }

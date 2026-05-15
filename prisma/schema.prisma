@@ -72,3 +72,25 @@ model UiSettings {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model CalendarSource {
+  id               String   @id @default(cuid())
+  href             String
+  url              String
+  normalizedHref   String   @unique
+  normalizedUrl    String   @unique
+  remoteName       String
+  displayName      String
+  remoteColor      String?
+  color            String?
+  isActive         Boolean  @default(true)
+  isDefault        Boolean  @default(false)
+  isMissingRemote  Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  lastDiscoveredAt DateTime?
+  lastSeenAt       DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}

@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { LocationTemplateRecord } from "@/types/entities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -83,10 +84,14 @@ export function LocationTemplateForm({
   return (
     <Card className="card-shadow border-white/70 bg-card/90">
       <CardHeader>
-        <CardTitle>{location ? "Standort bearbeiten" : "Neuer Standort"}</CardTitle>
-        <CardDescription>
-          Adressen werden später nach LOCATION übernommen, Beschreibung und Link können in DESCRIPTION einfließen.
-        </CardDescription>
+        <div className="flex items-center gap-1">
+          <CardTitle>{location ? "Standort bearbeiten" : "Neuer Standort"}</CardTitle>
+          <InfoPopover
+            description="Standortvorlagen schreiben die Adresse in LOCATION. Link, Notiz und Standardbeschreibung können später in die Terminbeschreibung übernommen werden."
+            title="Standortvorlagen"
+          />
+        </div>
+        <CardDescription>Adresse, Link und Zusatztexte für wiederkehrende Orte.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -94,26 +99,45 @@ export function LocationTemplateForm({
             <Label htmlFor="location-name">Name</Label>
             <Input id="location-name" required {...form.register("name")} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="location-address">Adresse</Label>
+            <div className="flex items-center gap-1">
+              <Label htmlFor="location-address">Adresse</Label>
+              <InfoPopover
+                description="Die Adresse wird später als LOCATION des Termins eingesetzt."
+                title="LOCATION"
+              />
+            </div>
             <Textarea id="location-address" required {...form.register("address")} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="location-link">Link</Label>
             <Input id="location-link" placeholder="https://..." {...form.register("link")} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="location-notes">Notiz</Label>
             <Textarea id="location-notes" {...form.register("notes")} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="location-default-description">Standardbeschreibung</Label>
+            <div className="flex items-center gap-1">
+              <Label htmlFor="location-default-description">Standardbeschreibung</Label>
+              <InfoPopover
+                description="Dieser Text wird beim Übernehmen der Standortvorlage in die Terminbeschreibung eingefügt."
+                title="Beschreibung"
+              />
+            </div>
             <Textarea id="location-default-description" {...form.register("defaultDescription")} />
           </div>
+
           <div className="flex items-center justify-between rounded-2xl border border-border bg-white/70 px-4 py-3">
             <div>
               <p className="font-medium">Aktiv</p>
-              <p className="text-sm text-muted-foreground">Inaktive Standorte bleiben dokumentiert.</p>
+              <p className="text-sm text-muted-foreground">
+                Inaktive Standorte bleiben dokumentiert.
+              </p>
             </div>
             <Controller
               control={form.control}

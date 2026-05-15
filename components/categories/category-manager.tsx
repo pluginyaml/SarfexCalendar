@@ -120,18 +120,26 @@ export function CategoryManager() {
       setSelectedCategoryId(null);
       await loadCategories();
     } catch (deleteError) {
-      toast.error(deleteError instanceof Error ? deleteError.message : "Loeschen fehlgeschlagen.");
+      toast.error(deleteError instanceof Error ? deleteError.message : "Löschen fehlgeschlagen.");
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <div className="rounded-[1.75rem] border border-white/70 bg-card/90 px-5 py-8 text-sm text-muted-foreground">Kategorien werden geladen...</div>;
+    return (
+      <div className="rounded-[1.75rem] border border-white/70 bg-card/90 px-5 py-8 text-sm text-muted-foreground">
+        Kategorien werden geladen...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="rounded-[1.75rem] border border-destructive/20 bg-destructive/5 px-5 py-8 text-sm text-destructive">{error}</div>;
+    return (
+      <div className="rounded-[1.75rem] border border-destructive/20 bg-destructive/5 px-5 py-8 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
   return (

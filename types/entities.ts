@@ -1,4 +1,4 @@
-export type DefaultView = "day" | "week" | "month";
+export type DefaultView = "day" | "week" | "month" | "year";
 
 export type CategoryRecord = {
   id: string;
@@ -47,6 +47,26 @@ export type UiSettingsRecord = {
   defaultView: DefaultView;
   weekStartsOn: number;
   timezone: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CalendarSourceRecord = {
+  id: string;
+  href: string;
+  url: string;
+  normalizedHref: string;
+  normalizedUrl: string;
+  remoteName: string;
+  displayName: string;
+  remoteColor: string | null;
+  color: string | null;
+  isActive: boolean;
+  isDefault: boolean;
+  isMissingRemote: boolean;
+  sortOrder: number;
+  lastDiscoveredAt: string | null;
+  lastSeenAt: string | null;
   createdAt: string;
   updatedAt: string;
 };

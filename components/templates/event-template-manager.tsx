@@ -133,7 +133,7 @@ export function EventTemplateManager() {
       setSelectedTemplateId(null);
       await loadData();
     } catch (deleteError) {
-      toast.error(deleteError instanceof Error ? deleteError.message : "Loeschen fehlgeschlagen.");
+      toast.error(deleteError instanceof Error ? deleteError.message : "Löschen fehlgeschlagen.");
     } finally {
       setIsSaving(false);
     }

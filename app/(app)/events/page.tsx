@@ -1,8 +1,6 @@
-import Link from "next/link";
-import { Plus } from "lucide-react";
 import { EventsManager } from "@/components/events/events-manager";
 import { Header } from "@/components/layout/header";
-import { Button } from "@/components/ui/button";
+import { NewEventButton } from "@/components/layout/new-event-button";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 
 export const metadata = {
@@ -14,16 +12,9 @@ export default function EventsPage() {
     <div className="space-y-6">
       <Header
         eyebrow="Termine"
-        title="Chronologische Listenansicht"
-        description="Die Liste zeigt standardmäßig die nächsten sechs Monate und lässt sich nach Text, Kategorie und Standort filtern."
-        actions={
-          <Button asChild className="gap-1.5">
-            <Link href="/events/new">
-              <Plus className="size-4" />
-              Termin
-            </Link>
-          </Button>
-        }
+        title="Chronologische Übersicht"
+        description="Suche, Filter und Kalenderquellen für die nächsten Monate."
+        actions={<NewEventButton />}
       />
       <EventsManager timezone={DEFAULT_TIMEZONE} />
     </div>

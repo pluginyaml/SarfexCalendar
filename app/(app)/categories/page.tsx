@@ -10,8 +10,8 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <Header
         eyebrow="Kategorien"
-        title="Farben, Icons und Standarderinnerungen"
-        description="Hier verwaltest du die lokalen Metadaten, die später Terminfarbe, Icon, Dauer und Reminder vorgeben."
+        title="Farben, Icons und Standards"
+        description="Lokale Metadaten für Terminfarben, Dauer und Erinnerungen."
       />
       <CategoryManager />
     </div>

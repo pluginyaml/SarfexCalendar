@@ -2,15 +2,18 @@ import {
   addDays,
   addMinutes,
   addMonths,
+  addYears,
   endOfMonth,
   endOfWeek,
+  endOfYear,
   format,
   startOfMonth,
   startOfWeek,
+  startOfYear,
 } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import type { EventViewModel } from "@/lib/calendar/types";
 import type { DefaultView } from "@/types/entities";
-import type { EventViewModel } from "@/lib/caldav/types";
 
 export function appendLinkToDescription(description: string, link: string) {
   const trimmedDescription = description.trim();
@@ -101,6 +104,16 @@ export function getCalendarRange(view: DefaultView, currentDate: Date, timezone:
     };
   }
 
+  if (view === "year") {
+    const yearStart = startOfYear(currentDate);
+    const yearEnd = endOfYear(currentDate);
+
+    return {
+      start: toRangeBoundary(yearStart, "00:00:00", timezone),
+      end: toRangeBoundary(yearEnd, "23:59:59", timezone),
+    };
+  }
+
   const monthStart = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 });
   const monthEnd = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 });
 
@@ -130,19 +143,41 @@ export function getUpcomingDaysRange(days: number, timezone: string) {
   };
 }
 
+export function shiftCalendarDate(
+  currentDate: Date,
+  view: DefaultView,
+  direction: "previous" | "next",
+) {
+  const delta = direction === "next" ? 1 : -1;
+
+  if (view === "day") {
+    return addDays(currentDate, delta);
+  }
+
+  if (view === "week") {
+    return addDays(currentDate, delta * 7);
+  }
+
+  if (view === "year") {
+    return addYears(currentDate, delta);
+  }
+
+  return addMonths(currentDate, delta);
+}
+
 export function formatEventDateTime(event: EventViewModel, timezone: string) {
   if (event.allDay) {
     if (event.start === event.end) {
       return `${format(new Date(`${event.start}T00:00:00`), "dd.MM.yyyy")} · Ganztägig`;
     }
 
-    return `${format(new Date(`${event.start}T00:00:00`), "dd.MM.yyyy")} - ${format(new Date(`${event.end}T00:00:00`), "dd.MM.yyyy")} · Ganztägig`;
+    return `${format(new Date(`${event.start}T00:00:00`), "dd.MM.yyyy")} – ${format(new Date(`${event.end}T00:00:00`), "dd.MM.yyyy")} · Ganztägig`;
   }
 
   const startLabel = formatInTimeZone(event.start, timezone, "dd.MM.yyyy, HH:mm");
   const endLabel = formatInTimeZone(event.end, timezone, "dd.MM.yyyy, HH:mm");
 
-  return `${startLabel} - ${endLabel}`;
+  return `${startLabel} – ${endLabel}`;
 }
 
 export function getEventLocalDate(event: EventViewModel, timezone: string) {
@@ -161,5 +196,5 @@ export function formatEventTimeLabel(event: EventViewModel, timezone: string) {
     return "Ganztägig";
   }
 
-  return `${formatInTimeZone(event.start, timezone, "HH:mm")} - ${formatInTimeZone(event.end, timezone, "HH:mm")}`;
+  return `${formatInTimeZone(event.start, timezone, "HH:mm")} – ${formatInTimeZone(event.end, timezone, "HH:mm")}`;
 }

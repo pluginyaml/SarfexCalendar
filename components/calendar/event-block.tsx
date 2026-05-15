@@ -1,7 +1,7 @@
 "use client";
 
 import { formatInTimeZone } from "date-fns-tz";
-import type { EventViewModel } from "@/lib/caldav";
+import type { EventViewModel } from "@/lib/calendar/types";
 import { formatEventTimeLabel } from "@/lib/event-time";
 import { cn } from "@/lib/utils";
 import { EventPopover } from "@/components/calendar/event-popover";

@@ -1,0 +1,3 @@
+ALTER TABLE "CalendarSource"
+ADD COLUMN "isMissingRemote" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "lastSeenAt" TIMESTAMP(3);

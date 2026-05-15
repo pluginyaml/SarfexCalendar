@@ -49,7 +49,7 @@ export function createJsonErrorResponse(error: unknown) {
 
     if (error.code === "P2003") {
       return jsonError(
-        "Dieser Eintrag kann nicht geloescht oder geaendert werden, weil noch Verknuepfungen bestehen.",
+        "Dieser Eintrag kann nicht gelöscht oder geändert werden, weil noch Verknüpfungen bestehen.",
         {
           status: 409,
           code: error.code,
@@ -66,7 +66,7 @@ export function createJsonErrorResponse(error: unknown) {
 
     if (error.code === "P2021") {
       return jsonError(
-        "Das Datenbankschema ist noch nicht bereit. Bitte fuehre die Migrationen aus.",
+        "Das Datenbankschema ist noch nicht bereit. Bitte führe die Migrationen aus.",
         {
           status: 500,
           code: error.code,
@@ -76,7 +76,7 @@ export function createJsonErrorResponse(error: unknown) {
   }
 
   if (error instanceof ZodError) {
-    return jsonError("Die Anfrage ist ungueltig.", {
+    return jsonError("Die Anfrage ist ungültig.", {
       status: 422,
       code: "VALIDATION_ERROR",
       details: error.flatten(),

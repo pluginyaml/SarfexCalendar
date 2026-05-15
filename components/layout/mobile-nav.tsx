@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus } from "lucide-react";
+import { NewEventButton } from "@/components/layout/new-event-button";
 import { mobileNavigation } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -11,12 +11,10 @@ export function MobileNav() {
 
   return (
     <>
-      <Link
-        href="/events/new"
-        className="fixed bottom-20 right-3 z-40 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_12px_28px_rgba(15,23,42,0.12)] md:hidden"
-      >
-        <Plus className="size-5" />
-      </Link>
+      <NewEventButton
+        className="fixed bottom-20 right-3 z-40 rounded-full px-4 py-3 text-sm shadow-[0_12px_28px_rgba(15,23,42,0.12)] md:hidden"
+        size="default"
+      />
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-black/6 bg-white/90 px-2.5 py-2 backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-1.5">

@@ -4,8 +4,10 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "@/lib/server/errors";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 import { normalizeReminderMinutes } from "@/lib/reminders";
+import { createOccurrenceInstanceKey } from "@/lib/calendar/source-utils";
 import { encodeEventId } from "@/lib/caldav/event-id";
 import type { CalDavEventInput, EventViewModel } from "@/lib/caldav/types";
+import { buildRecurrenceRule } from "@/lib/recurrence/rule";
 
 type ParsedProperty = {
   name: string;
@@ -98,7 +100,7 @@ function formatUtcTimestamp(date: Date) {
 
 function formatDateValue(dateString: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    throw new AppError("Ganztagstermine muessen als Datum uebergeben werden.", {
+    throw new AppError("Ganztagstermine müssen als Datum übergeben werden.", {
       code: "INVALID_ALL_DAY_DATE",
       statusCode: 422,
     });
@@ -111,7 +113,7 @@ function formatDateTimeValue(value: string, timezone: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    throw new AppError("Zeitangaben sind ungueltig.", {
+    throw new AppError("Zeitangaben sind ungültig.", {
       code: "INVALID_EVENT_TIME",
       statusCode: 422,
     });
@@ -296,6 +298,11 @@ export function buildEventIcs(
   const description = buildDescription(input.description);
   const location = buildLocation(input.location);
   const reminders = normalizeReminderMinutes(input.reminders);
+  const recurrenceRule = buildRecurrenceRule(input.recurrence, {
+    start: input.start,
+    timezone,
+    allDay: input.allDay,
+  });
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -330,6 +337,10 @@ export function buildEventIcs(
     lines.push(`LOCATION:${location}`);
   }
 
+  if (recurrenceRule) {
+    lines.push(`RRULE:${recurrenceRule}`);
+  }
+
   for (const reminder of reminders) {
     lines.push("BEGIN:VALARM");
     lines.push(`TRIGGER:${formatTriggerDuration(reminder)}`);
@@ -350,6 +361,12 @@ export function parseEventIcs(
     etag: string;
     timezone?: string;
     categoryColors?: Record<string, string>;
+    calendar?: {
+      id: string;
+      href: string;
+      name: string;
+      color: string | null;
+    } | null;
   },
 ): EventViewModel {
   const timezone = options.timezone ?? DEFAULT_TIMEZONE;
@@ -361,6 +378,7 @@ export function parseEventIcs(
   const description = getProperty(properties, "DESCRIPTION")?.value;
   const location = getProperty(properties, "LOCATION")?.value;
   const categories = getProperty(properties, "CATEGORIES");
+  const recurrenceRule = getProperty(properties, "RRULE")?.value ?? null;
   const dtStart = getProperty(properties, "DTSTART");
   const dtEnd = getProperty(properties, "DTEND");
   const duration = getProperty(properties, "DURATION");
@@ -427,5 +445,14 @@ export function parseEventIcs(
     color: options.categoryColors?.[categoryKey],
     lastModified: lastModified ? parseDateTimeValue(lastModified, "UTC") : null,
     reminders: parseAlarmMinutes(alarmLines),
+    calendarId: options.calendar?.id ?? null,
+    calendarHref: options.calendar?.href ?? null,
+    calendarName: options.calendar?.name ?? null,
+    calendarColor: options.calendar?.color ?? null,
+    recurrenceRule,
+    instanceKey: createOccurrenceInstanceKey(options.href, start),
+    isRecurring: recurrenceRule !== null,
+    isRecurringInstance: false,
+    canDrag: !allDay && recurrenceRule === null,
   };
 }

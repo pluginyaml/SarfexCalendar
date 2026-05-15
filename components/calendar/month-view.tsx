@@ -11,7 +11,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import { de } from "date-fns/locale";
-import type { EventViewModel } from "@/lib/caldav";
+import type { EventViewModel } from "@/lib/calendar/types";
 import { eventOccursOnDate } from "@/lib/event-time";
 import { cn } from "@/lib/utils";
 import { EventBlock } from "@/components/calendar/event-block";
@@ -79,7 +79,7 @@ export function MonthView({ currentDate, events, timezone }: MonthViewProps) {
 
                   <div className="space-y-1">
                     {dayEvents.slice(0, 3).map((event) => (
-                      <EventBlock compact event={event} key={`${event.href}-${event.etag}-${dateKey}`} timezone={timezone} variant="pill" />
+                      <EventBlock compact event={event} key={event.instanceKey} timezone={timezone} variant="pill" />
                     ))}
                     {dayEvents.length > 3 ? (
                       <p className="text-[10px] text-muted-foreground">+{dayEvents.length - 3} mehr</p>
